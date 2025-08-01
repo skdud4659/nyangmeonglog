@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// 이메일 + 패스워드 공통 형식
 export const emailSchema = z
     .string()
     .email('올바른 이메일 형식이 아닙니다')

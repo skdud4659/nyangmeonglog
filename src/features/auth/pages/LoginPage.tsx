@@ -1,30 +1,12 @@
+import { useLoginForm } from '@/features/auth/hooks/useLoginForm';
 import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
 import InputField from '@/shared/components/molecules/InputField';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 const LoginPage = () => {
-    const [form, setForm] = useState({ email: 'kmkmm0701@naver.com', password: '************' });
-    const [error, setError] = useState('');
-
-    const isFormValid = form.email.length > 0 && form.password.length > 0;
-
-    const handleChange =
-        (field: 'email' | 'password') => (e: React.ChangeEvent<HTMLInputElement>) => {
-            setForm(prev => ({ ...prev, [field]: e.target.value }));
-        };
-
-    const handleClear = (field: 'email' | 'password') => () => {
-        setForm(prev => ({ ...prev, [field]: '' }));
-    };
-
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!isFormValid) return;
-        console.log('로그인 시도', form);
-        // Firebase 로그인 로직
-    };
+    const { form, errors, isFormValid, isLoading, handleChange, handleClear, handleSubmit } =
+        useLoginForm();
 
     return (
         <div className="flex flex-col min-h-screen bg-white font-sans px-6">
@@ -40,35 +22,51 @@ const LoginPage = () => {
                 </h1>
             </header>
 
-            <form onSubmit={handleLogin} className="w-full max-w-sm">
+            <form
+                onSubmit={e => {
+                    e.preventDefault();
+                    handleSubmit();
+                }}
+                className="flex flex-col gap-8"
+            >
                 <InputField
                     label="이메일"
                     type="email"
                     value={form.email}
-                    onChange={handleChange('email')}
-                    onClear={handleClear('email')}
+                    onChange={e => handleChange('email', e.target.value)}
+                    onClear={() => handleClear('email')}
                     placeholder="이메일을 입력하세요"
+                    error={errors.email}
                 />
                 <InputField
                     label="비밀번호"
                     type="password"
                     value={form.password}
-                    onChange={handleChange('password')}
-                    onClear={handleClear('password')}
+                    onChange={e => handleChange('password', e.target.value)}
+                    onClear={() => handleClear('password')}
                     placeholder="비밀번호를 입력하세요"
+                    error={errors.password}
                 />
 
-                {error && (
-                    <motion.p
-                        className="text-red-500 text-sm mt-2"
+                {Object.keys(errors).length > 0 && (
+                    <motion.div
+                        className="mt-2 space-y-1"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                     >
-                        {error}
-                    </motion.p>
+                        {Object.values(errors).map((err, idx) => (
+                            <p key={idx} className="text-red-500 text-sm">
+                                {err}
+                            </p>
+                        ))}
+                    </motion.div>
                 )}
 
-                <Button type="submit" label="로그인" disabled={!isFormValid} />
+                <Button
+                    type="submit"
+                    label={isLoading ? '로그인 중...' : '로그인'}
+                    disabled={!isFormValid || isLoading}
+                />
             </form>
 
             <div className="py-5">

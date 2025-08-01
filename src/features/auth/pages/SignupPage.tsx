@@ -1,16 +1,28 @@
 import { useSignupForm } from '@/features/auth/hooks/useSignupForm';
+import { ROUTE_PATH } from '@/routes/constant';
+import Button from '@/shared/components/atoms/Button';
 import InputField from '@/shared/components/molecules/InputField';
-import { motion } from 'framer-motion';
+import TopNavigation from '@/shared/components/molecules/TopNavegtion';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
 const SignupPage = () => {
     const { form, errors, isFormValid, isLoading, handleChange, handleSubmit } = useSignupForm();
 
+    const navigate = useNavigate();
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const onSubmit = () => {
+        handleSubmit(() => {
+            navigate({ to: ROUTE_PATH.ONBOARDING });
+        });
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-white">
+            <TopNavigation />
             <header className="pt-20 pb-16 px-6">
                 <h1 className="text-3xl text-gray_9 font-bold">
                     <p>반가워요! 🐶 🐱</p>
@@ -23,8 +35,9 @@ const SignupPage = () => {
                 <form
                     onSubmit={e => {
                         e.preventDefault();
-                        handleSubmit();
+                        onSubmit();
                     }}
+                    className="flex flex-col gap-8"
                 >
                     <InputField
                         label="이메일 입력"
@@ -58,24 +71,15 @@ const SignupPage = () => {
                         showPasswordToggle
                         onTogglePassword={() => setShowConfirmPassword(prev => !prev)}
                     />
+                    <Button
+                        type="submit"
+                        label={isLoading ? '가입 중...' : '다음페이지'}
+                        variant="primary"
+                        disabled={!isFormValid || isLoading}
+                        onClick={onSubmit}
+                    />
                 </form>
             </main>
-
-            <div className="sticky bottom-0">
-                <motion.button
-                    type="submit"
-                    disabled={!isFormValid || isLoading}
-                    onClick={() => handleSubmit()}
-                    className={`w-full py-4 rounded-none font-semibold ${
-                        isFormValid && !isLoading
-                            ? 'bg-primary text-white hover:bg-primary/90'
-                            : 'bg-gray_2 text-gray_5 cursor-not-allowed'
-                    }`}
-                    whileTap={{ scale: isFormValid ? 0.98 : 1 }}
-                >
-                    {isLoading ? '가입 중...' : '다음페이지'}
-                </motion.button>
-            </div>
         </div>
     );
 };

@@ -1,27 +1,36 @@
-import { type SignupFormData, signupSchema } from '@/features/auth/schemas/authSchemas';
 import { useState } from 'react';
 import { z, type ZodIssue } from 'zod';
 
-export const useSignupForm = () => {
+export const loginSchema = z.object({
+    email: z.string().email('올바른 이메일 형식이 아닙니다'),
+    password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+export const useLoginForm = () => {
     // 데이터 임시 입력
-    const [form, setForm] = useState<SignupFormData>({
+    const [form, setForm] = useState<LoginFormData>({
         email: 'skdud4659@gmail.com',
         password: 'Test@1234',
-        confirmPassword: 'Test@1234',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (field: keyof SignupFormData, value: string) => {
+    const handleChange = (field: keyof LoginFormData, value: string) => {
         setForm(prev => ({ ...prev, [field]: value }));
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: '' }));
         }
     };
 
+    const handleClear = (field: keyof LoginFormData) => {
+        setForm(prev => ({ ...prev, [field]: '' }));
+    };
+
     const validateForm = () => {
         try {
-            signupSchema.parse(form);
+            loginSchema.parse(form);
             setErrors({});
             return true;
         } catch (err) {
@@ -36,16 +45,13 @@ export const useSignupForm = () => {
         }
     };
 
-    const isFormValid =
-        form.email &&
-        /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(form.password) &&
-        form.confirmPassword === form.password;
+    const isFormValid = form.email.length > 0 && form.password.length > 0;
 
     const handleSubmit = (onSuccess?: () => void) => {
         if (!validateForm()) return;
         setIsLoading(true);
         setTimeout(() => {
-            console.log('회원가입 데이터', form);
+            console.log('로그인 데이터', form);
             setIsLoading(false);
             if (onSuccess) onSuccess();
         }, 1000);
@@ -57,6 +63,7 @@ export const useSignupForm = () => {
         isFormValid,
         isLoading,
         handleChange,
+        handleClear,
         handleSubmit,
     };
 };
