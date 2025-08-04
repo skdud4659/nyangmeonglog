@@ -2,11 +2,19 @@ import { useLoginForm } from '@/features/auth/hooks/useLoginForm';
 import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
 import InputField from '@/shared/components/molecules/InputField';
+import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 
 const LoginPage = () => {
     const { form, errors, isFormValid, isLoading, handleChange, handleClear, handleSubmit } =
         useLoginForm();
+
+    const navigate = useNavigate();
+    const onSubmit = () => {
+        handleSubmit(() => {
+            navigate({ to: ROUTE_PATH.HOME });
+        });
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-white font-sans px-6">
@@ -25,7 +33,7 @@ const LoginPage = () => {
             <form
                 onSubmit={e => {
                     e.preventDefault();
-                    handleSubmit();
+                    onSubmit();
                 }}
                 className="flex flex-col gap-8"
             >

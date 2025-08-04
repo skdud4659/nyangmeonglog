@@ -2,7 +2,7 @@ import { useSignupForm } from '@/features/auth/hooks/useSignupForm';
 import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
 import InputField from '@/shared/components/molecules/InputField';
-import TopNavigation from '@/shared/components/molecules/TopNavegtion';
+import TopNavigation from '@/shared/components/molecules/TopNavigation';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 

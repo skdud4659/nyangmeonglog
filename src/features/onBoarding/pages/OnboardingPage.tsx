@@ -15,7 +15,7 @@ import type { PetInfoData } from '@/features/onBoarding/schemas/petInfoSchema';
 
 import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
-import TopNavigation from '@/shared/components/molecules/TopNavegtion';
+import TopNavigation from '@/shared/components/molecules/TopNavigation';
 import { useNavigate } from '@tanstack/react-router';
 
 const TOTAL_STEPS = 5;

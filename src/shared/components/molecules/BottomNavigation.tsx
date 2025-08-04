@@ -1,0 +1,62 @@
+import { ROUTE_PATH } from '@/routes/constant';
+import { Link, useLocation } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
+import { Calendar, ClipboardClock, PawPrint, User } from 'lucide-react';
+
+const BottomNavigation = () => {
+    const navItems = [
+        {
+            icon: PawPrint,
+            label: '펫',
+            isActive: false,
+            hasNotification: false,
+            to: ROUTE_PATH.WALK,
+        },
+        {
+            icon: Calendar,
+            label: '캘린더',
+            isActive: false,
+            hasNotification: false,
+            to: ROUTE_PATH.HOME,
+        },
+        {
+            icon: ClipboardClock,
+            label: '일정',
+            isActive: false,
+            hasNotification: true,
+            to: ROUTE_PATH.SCHEDULE,
+        },
+        {
+            icon: User,
+            label: '프로필',
+            isActive: false,
+            hasNotification: false,
+            to: ROUTE_PATH.MY_PAGE,
+        },
+    ];
+
+    const { pathname } = useLocation();
+    const isActive = (path: string) => pathname === path;
+    return (
+        <nav className="bg-white border-t border-gray-100 px-6 py-3">
+            <div className="flex items-center justify-around">
+                {navItems.map(item => (
+                    <motion.button
+                        key={item.label}
+                        className="relative flex flex-col items-center space-y-1 p-2 rounded-lg"
+                        whileTap={{ scale: 0.9 }}
+                    >
+                        <Link to={item.to}>
+                            <item.icon
+                                size={23}
+                                color={isActive(item.to) ? '#F38E8E' : '#C4C4C4'}
+                            />
+                        </Link>
+                    </motion.button>
+                ))}
+            </div>
+        </nav>
+    );
+};
+
+export default BottomNavigation;
