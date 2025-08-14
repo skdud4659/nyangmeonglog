@@ -18,10 +18,10 @@ const SignupPage = () => {
         handleSubmit(onSuccess, onAutoLoginFailure);
     };
     const onSuccess = () => {
-        navigate({ to: ROUTE_PATH.ONBOARDING });
+        navigate({ to: ROUTE_PATH.ONBOARDING.ROOT });
     };
     const onAutoLoginFailure = () => {
-        navigate({ to: ROUTE_PATH.LOGIN });
+        navigate({ to: ROUTE_PATH.AUTH.LOGIN });
     };
 
     return (

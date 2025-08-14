@@ -1,4 +1,4 @@
-import { eventIconMap } from '@/features/home/composables/icons';
+import { eventIconMap } from '@/features/main/home/composables/icons';
 import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 

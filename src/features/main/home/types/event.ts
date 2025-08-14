@@ -12,4 +12,5 @@ export interface EventItem {
     id: string;
     date: string; // YYYY-MM-DD
     category: EventCategory;
+    petId: string;
 }

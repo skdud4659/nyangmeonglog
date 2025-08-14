@@ -1,11 +1,10 @@
-import { CalendarGrid } from '@/features/home/components/CalendarGrid';
-import CalendarHeader from '@/features/home/components/CalendarHeader';
-import SimpleRecordForm from '@/features/home/components/SimpleRecordForm';
-import type { EventItem } from '@/features/home/types/event';
-import type { SimpleRecord } from '@/features/home/types/record';
+import { CalendarGrid } from '@/features/main/home/components/CalendarGrid';
+import CalendarHeader from '@/features/main/home/components/CalendarHeader';
+import SimpleRecordForm from '@/features/main/home/components/SimpleRecordForm';
+import type { EventItem } from '@/features/main/home/types/event';
+import type { SimpleRecord } from '@/features/main/home/types/record';
 import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
-import NavLayout from '@/shared/components/layouts/NavLayout';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 
@@ -73,7 +72,7 @@ const MainHomePage = () => {
     };
 
     return (
-        <NavLayout>
+        <>
             {/* 헤더 */}
             <div className="flex items-center px-6 py-4 relative z-20">
                 <button
@@ -194,7 +193,7 @@ const MainHomePage = () => {
                     </>
                 )}
             </AnimatePresence>
-        </NavLayout>
+        </>
     );
 };
 

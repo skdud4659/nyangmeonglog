@@ -1,4 +1,4 @@
-import type { SimpleRecord } from '@/features/home/types/record';
+import type { SimpleRecord } from '@/features/main/home/types/record';
 
 export const sampleRecords: SimpleRecord[] = [
     {

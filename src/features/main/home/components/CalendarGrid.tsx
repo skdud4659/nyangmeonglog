@@ -1,5 +1,5 @@
-import { eventIconMap } from '@/features/home/composables/icons';
-import type { EventItem } from '@/features/home/types/event';
+import { eventIconMap } from '@/features/main/home/composables/icons';
+import type { EventItem } from '@/features/main/home/types/event';
 import { motion } from 'framer-motion';
 
 interface CalendarGridProps {

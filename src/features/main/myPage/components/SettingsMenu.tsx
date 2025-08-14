@@ -46,7 +46,7 @@ export const SettingsMenu = () => {
         setIsLoggingOut(true);
         try {
             await signOut();
-            navigate({ to: ROUTE_PATH.LOGIN });
+            navigate({ to: ROUTE_PATH.AUTH.LOGIN });
         } finally {
             setIsLoggingOut(false);
         }

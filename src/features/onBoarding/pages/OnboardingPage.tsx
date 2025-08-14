@@ -97,7 +97,7 @@ const OnboardingPage = () => {
                 setCurrentPetIndex(pets.length - 1);
             }
         } else {
-            navigate({ to: ROUTE_PATH.LOGIN });
+            navigate({ to: ROUTE_PATH.AUTH.LOGIN });
         }
     };
 

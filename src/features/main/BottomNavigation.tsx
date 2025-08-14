@@ -10,28 +10,28 @@ const BottomNavigation = () => {
             label: '펫',
             isActive: false,
             hasNotification: false,
-            to: ROUTE_PATH.WALK,
+            to: ROUTE_PATH.MAIN.WALK,
         },
         {
             icon: Calendar,
             label: '캘린더',
             isActive: false,
             hasNotification: false,
-            to: ROUTE_PATH.HOME,
+            to: ROUTE_PATH.MAIN.HOME,
         },
         {
             icon: ClipboardClock,
             label: '일정',
             isActive: false,
             hasNotification: true,
-            to: ROUTE_PATH.SCHEDULE,
+            to: ROUTE_PATH.MAIN.SCHEDULE,
         },
         {
             icon: User,
             label: '프로필',
             isActive: false,
             hasNotification: false,
-            to: ROUTE_PATH.MY_PAGE,
+            to: ROUTE_PATH.MAIN.MY_PAGE,
         },
     ];
 

@@ -13,11 +13,11 @@ const LoginPage = () => {
         handleSubmit(onSuccess);
     };
     const onSuccess = () => {
-        navigate({ to: ROUTE_PATH.HOME });
+        navigate({ to: ROUTE_PATH.MAIN.HOME });
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white font-sans px-6">
+        <div className="flex flex-col font-sans px-6">
             <header className="w-full max-w-sm my-20">
                 <h1 className="text-3xl text-gray_9 font-bold">
                     <span className="block">우리 반려동물을 위한</span>
@@ -67,7 +67,7 @@ const LoginPage = () => {
                 <div className="flex items-center justify-center space-x-2 text-sm">
                     <p className="text-gray_7">아직 계정이 없으신가요?</p>
                     <a
-                        href={ROUTE_PATH.SIGNUP}
+                        href={ROUTE_PATH.AUTH.SIGNUP}
                         className="font-semibold text-gray_8 hover:underline"
                     >
                         회원가입

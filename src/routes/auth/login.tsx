@@ -1,7 +1,6 @@
 import LoginPage from '@/features/auth/pages/LoginPage';
-import { ROUTE_PATH } from '@/routes/constant';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute(ROUTE_PATH.LOGIN)({
+export const Route = createFileRoute('/auth/login')({
     component: LoginPage,
 });

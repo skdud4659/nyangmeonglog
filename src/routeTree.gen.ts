@@ -9,31 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as MyPageRouteImport } from './routes/myPage'
-import { Route as HomeRouteImport } from './routes/home'
+import { Route as R404RouteImport } from './routes/$404'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as MainWalkRouteImport } from './routes/main/walk'
+import { Route as MainScheduleRouteImport } from './routes/main/schedule'
+import { Route as MainMyPageRouteImport } from './routes/main/myPage'
+import { Route as MainHomeRouteImport } from './routes/main/home'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyPageRoute = MyPageRouteImport.update({
-  id: '/myPage',
-  path: '/myPage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const R404Route = R404RouteImport.update({
+  id: '/$404',
+  path: '/$404',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/onboarding/',
+  path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainWalkRoute = MainWalkRouteImport.update({
+  id: '/main/walk',
+  path: '/main/walk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainScheduleRoute = MainScheduleRouteImport.update({
+  id: '/main/schedule',
+  path: '/main/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainMyPageRoute = MainMyPageRouteImport.update({
+  id: '/main/myPage',
+  path: '/main/myPage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainHomeRoute = MainHomeRouteImport.update({
+  id: '/main/home',
+  path: '/main/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -49,80 +67,93 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/myPage': typeof MyPageRoute
-  '/onboarding': typeof OnboardingRoute
+  '/$404': typeof R404Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/main/home': typeof MainHomeRoute
+  '/main/myPage': typeof MainMyPageRoute
+  '/main/schedule': typeof MainScheduleRoute
+  '/main/walk': typeof MainWalkRoute
+  '/onboarding': typeof OnboardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/myPage': typeof MyPageRoute
-  '/onboarding': typeof OnboardingRoute
+  '/$404': typeof R404Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/main/home': typeof MainHomeRoute
+  '/main/myPage': typeof MainMyPageRoute
+  '/main/schedule': typeof MainScheduleRoute
+  '/main/walk': typeof MainWalkRoute
+  '/onboarding': typeof OnboardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/myPage': typeof MyPageRoute
-  '/onboarding': typeof OnboardingRoute
+  '/$404': typeof R404Route
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/main/home': typeof MainHomeRoute
+  '/main/myPage': typeof MainMyPageRoute
+  '/main/schedule': typeof MainScheduleRoute
+  '/main/walk': typeof MainWalkRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/home'
-    | '/myPage'
-    | '/onboarding'
+    | '/$404'
     | '/auth/login'
     | '/auth/signup'
+    | '/main/home'
+    | '/main/myPage'
+    | '/main/schedule'
+    | '/main/walk'
+    | '/onboarding'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/myPage' | '/onboarding' | '/auth/login' | '/auth/signup'
+  to:
+    | '/'
+    | '/$404'
+    | '/auth/login'
+    | '/auth/signup'
+    | '/main/home'
+    | '/main/myPage'
+    | '/main/schedule'
+    | '/main/walk'
+    | '/onboarding'
   id:
     | '__root__'
     | '/'
-    | '/home'
-    | '/myPage'
-    | '/onboarding'
+    | '/$404'
     | '/auth/login'
     | '/auth/signup'
+    | '/main/home'
+    | '/main/myPage'
+    | '/main/schedule'
+    | '/main/walk'
+    | '/onboarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HomeRoute: typeof HomeRoute
-  MyPageRoute: typeof MyPageRoute
-  OnboardingRoute: typeof OnboardingRoute
+  R404Route: typeof R404Route
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  MainHomeRoute: typeof MainHomeRoute
+  MainMyPageRoute: typeof MainMyPageRoute
+  MainScheduleRoute: typeof MainScheduleRoute
+  MainWalkRoute: typeof MainWalkRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/myPage': {
-      id: '/myPage'
-      path: '/myPage'
-      fullPath: '/myPage'
-      preLoaderRoute: typeof MyPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
+    '/$404': {
+      id: '/$404'
+      path: '/$404'
+      fullPath: '/$404'
+      preLoaderRoute: typeof R404RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -130,6 +161,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/walk': {
+      id: '/main/walk'
+      path: '/main/walk'
+      fullPath: '/main/walk'
+      preLoaderRoute: typeof MainWalkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/schedule': {
+      id: '/main/schedule'
+      path: '/main/schedule'
+      fullPath: '/main/schedule'
+      preLoaderRoute: typeof MainScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/myPage': {
+      id: '/main/myPage'
+      path: '/main/myPage'
+      fullPath: '/main/myPage'
+      preLoaderRoute: typeof MainMyPageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/home': {
+      id: '/main/home'
+      path: '/main/home'
+      fullPath: '/main/home'
+      preLoaderRoute: typeof MainHomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -151,11 +217,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HomeRoute: HomeRoute,
-  MyPageRoute: MyPageRoute,
-  OnboardingRoute: OnboardingRoute,
+  R404Route: R404Route,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  MainHomeRoute: MainHomeRoute,
+  MainMyPageRoute: MainMyPageRoute,
+  MainScheduleRoute: MainScheduleRoute,
+  MainWalkRoute: MainWalkRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

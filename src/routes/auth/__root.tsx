@@ -2,7 +2,7 @@ import { Outlet } from '@tanstack/react-router';
 
 const AuthRoot = () => {
     return (
-        <div>
+        <div className="min-h-screen bg-white">
             <Outlet />
         </div>
     );

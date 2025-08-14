@@ -1,11 +1,11 @@
 import BottomNavigation from '@/shared/components/molecules/BottomNavigation';
 import type { ReactNode } from 'react';
 
-interface NavLayoutProps {
+interface MainContainerProps {
     children: ReactNode;
 }
 
-const NavLayout = ({ children }: NavLayoutProps) => {
+const MainContainer = ({ children }: MainContainerProps) => {
     return (
         <div className="flex flex-col h-screen font-sans relative">
             {/* 메인 컨텐츠 */}
@@ -17,4 +17,4 @@ const NavLayout = ({ children }: NavLayoutProps) => {
     );
 };
 
-export default NavLayout;
+export default MainContainer;
