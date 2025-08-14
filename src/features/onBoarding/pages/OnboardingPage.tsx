@@ -105,7 +105,11 @@ const OnboardingPage = () => {
             }
 
             if (currentStep === 3) {
-                await finalizeOnboarding({ displayName: ownerInfo.name, mode: modeSettings.mode });
+                await finalizeOnboarding({
+                    displayName: ownerInfo.name,
+                    mode: modeSettings.mode,
+                    photoDataUrl: ownerInfo.photo,
+                });
             }
 
             if (currentStep === 2 && currentPetIndex < pets.length - 1) {

@@ -1,5 +1,6 @@
 import { ownerInfoSchema, type OwnerInfoData } from '@/features/onBoarding/schemas/ownerInfoSchema';
 import { useState } from 'react';
+import { z } from 'zod';
 
 export const useOwnerInfo = () => {
     // 데이터 임시 입력
@@ -9,7 +10,15 @@ export const useOwnerInfo = () => {
     });
 
     const validate = () => {
-        ownerInfoSchema.parse(ownerInfo);
+        try {
+            ownerInfoSchema.parse(ownerInfo);
+            return true;
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                console.log(err.issues);
+            }
+            return false;
+        }
     };
 
     return {

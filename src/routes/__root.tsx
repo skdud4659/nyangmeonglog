@@ -35,7 +35,9 @@ const RootComponent = () => {
 
 export const Route = createRootRoute({
     beforeLoad: async ({ location }) => {
-        const isAuthRoute = location.pathname.startsWith('/auth');
+        const pathname = location.pathname;
+        const isAuthRoute = pathname.startsWith('/auth');
+        const isOnboardingRoute = pathname.startsWith(ROUTE_PATH.ONBOARDING.ROOT);
 
         const { data } = await supabase.auth.getSession();
         const session = data.session;
@@ -44,8 +46,30 @@ export const Route = createRootRoute({
             throw redirect({ to: ROUTE_PATH.AUTH.LOGIN });
         }
 
+        if (!session) return;
+
         if (session && isAuthRoute) {
             throw redirect({ to: ROUTE_PATH.MAIN.HOME });
+        }
+
+        if (!isOnboardingRoute) {
+            const userId = session.user.id;
+            const [profileRes, petsRes] = await Promise.all([
+                supabase.from('profiles').select('display_name').eq('id', userId).single(),
+                supabase
+                    .from('pets')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', userId),
+            ]);
+
+            const displayName = profileRes.data?.display_name ?? '';
+            const hasProfileName = typeof displayName === 'string' && displayName.trim().length > 0;
+            const petsCount = petsRes.count ?? 0;
+            const hasAnyPet = petsCount > 0;
+
+            if (!hasProfileName && !hasAnyPet) {
+                throw redirect({ to: ROUTE_PATH.ONBOARDING.ROOT });
+            }
         }
     },
     component: RootComponent,

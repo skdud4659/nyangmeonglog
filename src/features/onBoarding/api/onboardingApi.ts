@@ -84,11 +84,20 @@ export const insertPet = async (pet: PetInsertPayload): Promise<string> => {
 export const finalizeOnboarding = async (params: {
     displayName?: string;
     mode?: OnboardingMode;
+    photoDataUrl?: string;
 }): Promise<void> => {
     const userId = await getUserIdOrThrow();
     await ensureProfile();
     const updates: Record<string, unknown> = { is_onboarded: true };
     if (params.displayName) updates.display_name = params.displayName;
+    if (params.photoDataUrl) {
+        try {
+            const photoUrl = await uploadDataUrlToStorage(params.photoDataUrl);
+            updates.photo_url = photoUrl;
+        } catch (e) {
+            console.warn('프로필 사진 업로드 실패:', e);
+        }
+    }
     const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
     if (error) throw error;
 };
