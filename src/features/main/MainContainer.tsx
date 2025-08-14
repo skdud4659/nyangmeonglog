@@ -1,4 +1,4 @@
-import BottomNavigation from '@/shared/components/molecules/BottomNavigation';
+import BottomNavigation from '@/features/main/BottomNavigation';
 import type { ReactNode } from 'react';
 
 interface MainContainerProps {

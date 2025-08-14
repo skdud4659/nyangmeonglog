@@ -8,8 +8,7 @@
 
 # Supabase local files
 .supabase/
-supabase-debug.log
-.supabase/
+supabase/*
 
 # Local environment variables
 .env

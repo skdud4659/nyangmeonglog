@@ -13,6 +13,7 @@ import { usePetCount } from '@/features/onBoarding/hooks/usePetCount';
 import { usePetDetails } from '@/features/onBoarding/hooks/usePetDetails';
 import type { PetInfoData } from '@/features/onBoarding/schemas/petInfoSchema';
 
+import { finalizeOnboarding, insertPet } from '@/features/onBoarding/api/onboardingApi';
 import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
 import TopNavigation from '@/shared/components/molecules/TopNavigation';
@@ -78,13 +79,43 @@ const OnboardingPage = () => {
         }
     };
 
-    const handleNext = () => {
-        if (!isStepValid()) return;
-        if (currentStep === 2 && currentPetIndex < pets.length - 1) {
-            setCurrentPetIndex(currentPetIndex + 1);
-        } else if (currentStep < TOTAL_STEPS - 1) {
-            setCurrentStep(currentStep + 1);
-            setCurrentPetIndex(0);
+    const handleNext = async () => {
+        try {
+            isStepValid();
+
+            if (currentStep === 2) {
+                if (currentPetIndex === pets.length - 1) {
+                    const tasks = pets.map(p =>
+                        insertPet({
+                            name: p.name,
+                            species: p.id.startsWith('dog') ? 'dog' : 'cat',
+                            gender: p.gender,
+                            breed: p.breed,
+                            birthdate: p.birthDate || undefined,
+                            adoption_date: p.adoptionDate || undefined,
+                            weight_kg: isNaN(parseFloat(p.weight))
+                                ? undefined
+                                : parseFloat(p.weight),
+                            neutered: p.isNeutered,
+                            photo_data_url: p.photo,
+                        })
+                    );
+                    await Promise.all(tasks);
+                }
+            }
+
+            if (currentStep === 3) {
+                await finalizeOnboarding({ displayName: ownerInfo.name, mode: modeSettings.mode });
+            }
+
+            if (currentStep === 2 && currentPetIndex < pets.length - 1) {
+                setCurrentPetIndex(currentPetIndex + 1);
+            } else if (currentStep < TOTAL_STEPS - 1) {
+                setCurrentStep(currentStep + 1);
+                setCurrentPetIndex(0);
+            }
+        } catch (e) {
+            console.error(e);
         }
     };
 
