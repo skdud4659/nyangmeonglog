@@ -15,9 +15,13 @@ const SignupPage = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const onSubmit = () => {
-        handleSubmit(() => {
-            navigate({ to: ROUTE_PATH.ONBOARDING });
-        });
+        handleSubmit(onSuccess, onAutoLoginFailure);
+    };
+    const onSuccess = () => {
+        navigate({ to: ROUTE_PATH.ONBOARDING });
+    };
+    const onAutoLoginFailure = () => {
+        navigate({ to: ROUTE_PATH.LOGIN });
     };
 
     return (

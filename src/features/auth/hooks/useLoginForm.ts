@@ -1,3 +1,4 @@
+import { supabase } from '@/shared/lib/supabase';
 import { useState } from 'react';
 import { z, type ZodIssue } from 'zod';
 
@@ -47,14 +48,36 @@ export const useLoginForm = () => {
 
     const isFormValid = form.email.length > 0 && form.password.length > 0;
 
-    const handleSubmit = (onSuccess?: () => void) => {
+    const handleSubmit = async (onSuccess?: () => void) => {
         if (!validateForm()) return;
         setIsLoading(true);
-        setTimeout(() => {
-            console.log('로그인 데이터', form);
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: form.email,
+                password: form.password,
+            });
+
+            if (error) throw error;
+
+            if (data?.session) {
+                if (onSuccess) onSuccess();
+            } else {
+                setErrors({ password: '세션을 생성하지 못했습니다. 다시 시도해주세요.' });
+            }
+        } catch (err) {
+            let message = '로그인에 실패했습니다';
+            if (err && typeof err === 'object' && 'message' in err) {
+                message = String((err as { message?: string }).message ?? message);
+            }
+            const newErrors: Record<string, string> = {};
+            if (message.toLowerCase().includes('password')) newErrors.password = message;
+            else if (message.toLowerCase().includes('email')) newErrors.email = message;
+            else newErrors.password = message;
+            setErrors(newErrors);
+        } finally {
             setIsLoading(false);
-            if (onSuccess) onSuccess();
-        }, 1000);
+        }
     };
 
     return {

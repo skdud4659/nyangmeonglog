@@ -3,7 +3,6 @@ import { ROUTE_PATH } from '@/routes/constant';
 import Button from '@/shared/components/atoms/Button';
 import InputField from '@/shared/components/molecules/InputField';
 import { useNavigate } from '@tanstack/react-router';
-import { motion } from 'framer-motion';
 
 const LoginPage = () => {
     const { form, errors, isFormValid, isLoading, handleChange, handleClear, handleSubmit } =
@@ -11,9 +10,10 @@ const LoginPage = () => {
 
     const navigate = useNavigate();
     const onSubmit = () => {
-        handleSubmit(() => {
-            navigate({ to: ROUTE_PATH.HOME });
-        });
+        handleSubmit(onSuccess);
+    };
+    const onSuccess = () => {
+        navigate({ to: ROUTE_PATH.HOME });
     };
 
     return (
@@ -55,20 +55,6 @@ const LoginPage = () => {
                     placeholder="비밀번호를 입력하세요"
                     error={errors.password}
                 />
-
-                {Object.keys(errors).length > 0 && (
-                    <motion.div
-                        className="mt-2 space-y-1"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                    >
-                        {Object.values(errors).map((err, idx) => (
-                            <p key={idx} className="text-red-500 text-sm">
-                                {err}
-                            </p>
-                        ))}
-                    </motion.div>
-                )}
 
                 <Button
                     type="submit"

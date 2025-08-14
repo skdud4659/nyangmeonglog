@@ -1,6 +1,5 @@
 import { petInfoSchema, type PetInfoData } from '@/features/onBoarding/schemas/petInfoSchema';
 import { useState } from 'react';
-import { z } from 'zod';
 
 export const usePetDetails = () => {
     const [pets, setPets] = useState<PetInfoData[]>([]);
@@ -10,15 +9,7 @@ export const usePetDetails = () => {
     };
 
     const validate = (index: number) => {
-        try {
-            petInfoSchema.parse(pets[index]);
-            return true;
-        } catch (err) {
-            if (err instanceof z.ZodError) {
-                console.log(err.issues);
-            }
-            return false;
-        }
+        petInfoSchema.parse(pets[index]);
     };
 
     return {

@@ -1,4 +1,5 @@
 import { type SignupFormData, signupSchema } from '@/features/auth/schemas/authSchemas';
+import { supabase } from '@/shared/lib/supabase';
 import { useState } from 'react';
 import { z, type ZodIssue } from 'zod';
 
@@ -41,14 +42,42 @@ export const useSignupForm = () => {
         /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(form.password) &&
         form.confirmPassword === form.password;
 
-    const handleSubmit = (onSuccess?: () => void) => {
+    const handleSubmit = async (onSuccess?: () => void, onAutoLoginFailure?: () => void) => {
         if (!validateForm()) return;
         setIsLoading(true);
-        setTimeout(() => {
-            console.log('회원가입 데이터', form);
-            setIsLoading(false);
+
+        try {
+            const { error } = await supabase.auth.signUp({
+                email: form.email,
+                password: form.password,
+            });
+
+            if (error) throw error;
+
+            try {
+                await supabase.auth.signInWithPassword({
+                    email: form.email,
+                    password: form.password,
+                });
+            } catch {
+                if (onAutoLoginFailure) onAutoLoginFailure();
+                return;
+            }
+
             if (onSuccess) onSuccess();
-        }, 1000);
+        } catch (err) {
+            let message = '회원가입에 실패했습니다';
+            if (err && typeof err === 'object' && 'message' in err) {
+                message = String((err as { message?: string }).message ?? message);
+            }
+            const newErrors: Record<string, string> = {};
+            if (message.toLowerCase().includes('password')) newErrors.password = message;
+            else if (message.toLowerCase().includes('email')) newErrors.email = message;
+            else newErrors.email = message;
+            setErrors(newErrors);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return {
