@@ -6,10 +6,10 @@
 /build/
 /.vite/
 
-# Firebase local files
-.firebase/
-firebase-debug.log
-.firebaserc
+# Supabase local files
+.supabase/
+supabase-debug.log
+.supabase/
 
 # Local environment variables
 .env
