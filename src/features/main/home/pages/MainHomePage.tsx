@@ -7,8 +7,10 @@ import type { EventCategory, EventItem } from '@/features/main/home/types/event'
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
+import { initPushForUser } from '@/shared/lib/push';
 import { useAuthStore } from '@/shared/store/authStore';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Bell } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const MainHomePage = () => {
@@ -25,6 +27,7 @@ const MainHomePage = () => {
     const [showPetSelector, setShowPetSelector] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     const activePet = pets.find(pet => pet.id === activePetId);
     const filteredEvents = useMemo<EventItem[]>(() => {
@@ -109,6 +112,8 @@ const MainHomePage = () => {
             if (!activePetId && list.length > 0) {
                 setActivePetId(list[0].id);
             }
+            // Initialize push subscription for the user (non-blocking)
+            initPushForUser(user.id);
         };
         run();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,6 +147,14 @@ const MainHomePage = () => {
                     onMonthChange={setCurrentMonth}
                     onYearChange={setCurrentYear}
                 />
+                {/* Bell icon */}
+                <button className="ml-auto relative" onClick={() => setShowNotifications(v => !v)}>
+                    <Bell size={22} className="text-gray_6" />
+                    {/* 간단한 배지: 임시 1개 이상 있다고 가정 */}
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] rounded-full px-1 leading-4 min-w-4 text-center">
+                        •
+                    </span>
+                </button>
             </div>
 
             {/* 달력 */}
@@ -256,6 +269,35 @@ const MainHomePage = () => {
                             )}
                         </motion.div>
                     </>
+                )}
+            </AnimatePresence>
+
+            {/* Notifications Popover */}
+            <AnimatePresence>
+                {showNotifications && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="absolute right-4 top-16 z-50 bg-white rounded-xl shadow-lg border p-3 w-72"
+                    >
+                        <div className="text-body2-bold mb-2">알림</div>
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {/* TODO: 실제 알림 데이터로 대체 */}
+                            <div className="text-sm text-gray_8">
+                                공지: 새로운 기능이 추가되었습니다.
+                            </div>
+                            <div className="text-sm text-gray_8">일정: 내일 접종 1시간 전 알림</div>
+                        </div>
+                        <div className="mt-3 text-right">
+                            <button
+                                className="text-label text-gray_6"
+                                onClick={() => setShowNotifications(false)}
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </>

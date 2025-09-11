@@ -1,4 +1,5 @@
 import App from '@/app/App';
+import { registerServiceWorker } from '@/shared/lib/push';
 import '@/shared/styles/index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -11,3 +12,6 @@ root.render(
         <App />
     </React.StrictMode>
 );
+
+// Register SW eagerly (permission prompt will be handled by initPushForUser)
+registerServiceWorker();
