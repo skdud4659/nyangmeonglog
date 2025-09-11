@@ -6,7 +6,11 @@ export type EventCategory =
     | 'pee' // 소변
     | 'grooming' // 미용/목욕/양치
     | 'medicine' // 약
-    | 'checkup'; // 구충/접종/건강검진
+    | 'checkup' // 건강검진
+    | 'brush' // 양치
+    | 'bath' // 목욕
+    | 'spasm' // 구충
+    | 'vaccination'; // 접종
 
 export interface EventItem {
     id: string;

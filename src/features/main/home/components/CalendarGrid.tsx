@@ -67,7 +67,11 @@ export const CalendarGrid = ({
                     <div
                         key={day}
                         className={`text-center text-sm font-medium py-2 ${
-                            index === 0 || index === 6 ? 'text-blue-500' : 'text-gray-500'
+                            index === 0
+                                ? 'text-red-500'
+                                : index === 6
+                                  ? 'text-blue-500'
+                                  : 'text-gray-500'
                         }`}
                     >
                         {day}
@@ -78,28 +82,49 @@ export const CalendarGrid = ({
             {/* 날짜 grid */}
             <div className="grid grid-cols-7 gap-1 flex-1">
                 {getDaysInMonth().map((dayInfo, idx) => {
+                    const dayOfWeek = dayInfo.isCurrentMonth
+                        ? new Date(currentYear, currentMonth, dayInfo.day).getDay()
+                        : -1;
+                    const dateColorClass = dayInfo.isCurrentMonth
+                        ? dayOfWeek === 0
+                            ? 'text-primary'
+                            : dayOfWeek === 6
+                              ? 'text-blue-500'
+                              : 'text-gray-800'
+                        : 'text-gray-300';
+                    const todayMid = new Date();
+                    todayMid.setHours(0, 0, 0, 0);
+                    const cellDate = new Date(currentYear, currentMonth, dayInfo.day);
+                    const isFuture =
+                        dayInfo.isCurrentMonth && cellDate.getTime() > todayMid.getTime();
                     const dayEvents = dayInfo.isCurrentMonth ? getEventsForDate(dayInfo.day) : [];
                     const isSelected = selectedDate === dayInfo.day && dayInfo.isCurrentMonth;
 
+                    const isInteractive = dayInfo.isCurrentMonth && !isFuture;
                     return (
                         <motion.button
                             key={`${dayInfo.isCurrentMonth ? 'current' : 'other'}-${dayInfo.day}-${idx}`}
                             className={`
     w-full h-full flex flex-col items-center justify-start rounded-lg
     ${dayInfo.isCurrentMonth ? 'text-gray-800' : 'text-gray-300'}
-    ${dayInfo.isToday ? 'bg-gray-100' : isSelected ? 'bg-blue-50 border-2 border-blue-200' : 'hover:bg-gray-50'}
+    ${dayInfo.isToday ? 'bg-gray-100' : isSelected ? 'bg-blue-50 border-2 border-blue-200' : isInteractive ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default'}
     transition-colors duration-200
   `}
                             style={{ aspectRatio: '1 / 1' }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => dayInfo.isCurrentMonth && onDateSelect(dayInfo.day)}
+                            disabled={!isInteractive}
+                            whileTap={isInteractive ? { scale: 0.95 } : undefined}
+                            onClick={() => isInteractive && onDateSelect(dayInfo.day)}
                         >
                             {/* 날짜 */}
-                            <div className="mt-1 text-sm font-medium">{dayInfo.day}</div>
+                            <div
+                                className={`mt-1 text-sm font-medium ${dateColorClass} ${isFuture ? 'opacity-40' : ''}`}
+                            >
+                                {dayInfo.day}
+                            </div>
 
                             {/* 아이콘 영역 */}
                             <div
-                                className="grid grid-cols-2 gap-1 flex-1 overflow-hidden"
+                                className={`grid grid-cols-2 gap-1 auto-rows-min justify-start items-start flex-1 overflow-hidden ${isFuture ? 'opacity-30' : ''}`}
                                 style={{
                                     maxHeight: 'calc(100% - 20px)',
                                 }}
@@ -107,10 +132,9 @@ export const CalendarGrid = ({
                                 {dayEvents.map(event => {
                                     const IconComponent = eventIconMap[event.category];
                                     return IconComponent ? (
-                                        <IconComponent
-                                            key={event.id}
-                                            className="w-3 h-3 flex-shrink-0"
-                                        />
+                                        <div key={event.id} className="w-[12.5px] h-[12.5px]">
+                                            <IconComponent className="w-[12.5px] h-[12.5px]" />
+                                        </div>
                                     ) : null;
                                 })}
                             </div>
