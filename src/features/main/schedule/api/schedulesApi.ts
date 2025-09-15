@@ -97,3 +97,43 @@ export async function createSchedule(input: {
     if (error) throw error;
     return mapRowToItem(data as DbScheduleRow);
 }
+
+export async function updateSchedule(
+    id: string,
+    input: {
+        title?: string;
+        category?: ScheduleCategory;
+        date?: string; // YYYY-MM-DD
+        location?: string;
+        notificationsEnabled?: boolean;
+        reminderMinutes?: number;
+        isCompleted?: boolean;
+    }
+): Promise<ScheduleItem> {
+    const payload: Partial<DbScheduleRow> = {};
+    if (typeof input.title !== 'undefined') payload.title = input.title;
+    if (typeof input.category !== 'undefined') payload.category = input.category;
+    if (typeof input.date !== 'undefined') payload.date = input.date;
+    if (typeof input.location !== 'undefined') payload.location = input.location ?? null;
+    if (typeof input.notificationsEnabled !== 'undefined')
+        payload.notifications_enabled = input.notificationsEnabled;
+    if (typeof input.reminderMinutes !== 'undefined')
+        payload.reminder_minutes = input.reminderMinutes;
+    if (typeof input.isCompleted !== 'undefined') payload.is_completed = input.isCompleted;
+
+    const { data, error } = await supabase
+        .from('schedules')
+        .update(payload)
+        .eq('id', id)
+        .select(
+            'id, user_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
+        )
+        .single();
+    if (error) throw error;
+    return mapRowToItem(data as DbScheduleRow);
+}
+
+export async function deleteSchedule(id: string): Promise<void> {
+    const { error } = await supabase.from('schedules').delete().eq('id', id);
+    if (error) throw error;
+}

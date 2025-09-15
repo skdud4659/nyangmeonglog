@@ -10,7 +10,6 @@ import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import { initPushForUser } from '@/shared/lib/push';
 import { useAuthStore } from '@/shared/store/authStore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const MainHomePage = () => {
@@ -148,13 +147,10 @@ const MainHomePage = () => {
                     onYearChange={setCurrentYear}
                 />
                 {/* Bell icon */}
-                <button className="ml-auto relative" onClick={() => setShowNotifications(v => !v)}>
-                    <Bell size={22} className="text-gray_6" />
-                    {/* 간단한 배지: 임시 1개 이상 있다고 가정 */}
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] rounded-full px-1 leading-4 min-w-4 text-center">
-                        •
-                    </span>
-                </button>
+                {/* <button className="ml-auto relative" onClick={() => setShowNotifications(v => !v)}>
+                    <Bell size={20} className="text-gray_6" />
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full" />
+                </button> */}
             </div>
 
             {/* 달력 */}

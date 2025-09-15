@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const CalendarHeader = ({
@@ -88,17 +88,6 @@ const CalendarHeader = ({
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
-
-            {/* Right: Notification */}
-            <div className="relative">
-                <motion.button
-                    className="p-2 rounded-full hover:bg-gray-50"
-                    whileTap={{ scale: 0.9 }}
-                >
-                    <Bell size={20} color="#5F5F5F" />
-                    <div className="absolute top-1 right-1 w-2 h-2 bg-red-400 rounded-full" />
-                </motion.button>
             </div>
 
             {/* 바깥 클릭 시 닫힘 */}

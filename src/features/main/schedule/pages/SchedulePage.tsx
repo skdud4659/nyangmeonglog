@@ -1,11 +1,14 @@
 import {
     createSchedule,
+    deleteSchedule,
     listSchedules,
     markScheduleCompleted,
+    updateSchedule,
     type ScheduleCategory,
     type ScheduleItem,
 } from '@/features/main/schedule/api/schedulesApi';
 import AddScheduleModal from '@/features/main/schedule/components/AddScheduleModal';
+import EditScheduleModal from '@/features/main/schedule/components/EditScheduleModal';
 import DentalBgIcon from '@/shared/assets/icons/dentalIcon.svg?react';
 import InjectionBgIcon from '@/shared/assets/icons/injectionIcon.svg?react';
 import PawPrintIcon from '@/shared/assets/icons/pawPrintIcon.svg?react';
@@ -14,7 +17,7 @@ import IconButton from '@/shared/components/atoms/IconButton';
 import { useAuthStore } from '@/shared/store/authStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, MoreVertical } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 // 사용하지 않는 과거 헬퍼 제거
 
@@ -41,15 +44,37 @@ const getDday = (isoDate: string) => {
 
 const SectionHeader = ({ title }: { title: string }) => (
     <div className="px-6 mt-6 mb-3">
-        <h2 className="text-body1-bold text-gray_9">{title}</h2>
+        <p className="text-sm text-gray_9">{title}</p>
     </div>
 );
 
-const ScheduleRow = ({ item }: { item: ScheduleItem }) => {
+const ScheduleRow = ({
+    item,
+    onEdit,
+    onDelete,
+}: {
+    item: ScheduleItem;
+    onEdit: (id: string) => void;
+    onDelete: (id: string) => void;
+}) => {
     const dday = getDday(item.date);
+    const [open, setOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handleDown = (e: MouseEvent) => {
+            if (!menuRef.current) return;
+            if (!menuRef.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleDown);
+        return () => document.removeEventListener('mousedown', handleDown);
+    }, [open]);
     return (
         <div
-            className="flex items-center justify-between bg-white rounded-2xl px-4 py-4 shadow-sm"
+            className="flex items-center justify-between bg-white rounded-2xl px-4 py-[6px] shadow-sm relative"
             style={{ boxShadow: '0px 1px 13px 0px rgba(202,202,202,0.25)' }}
         >
             <div className="flex items-center gap-3">
@@ -61,7 +86,34 @@ const ScheduleRow = ({ item }: { item: ScheduleItem }) => {
                     <span className="text-body2-bold text-gray_9">{item.title}</span>
                 </div>
             </div>
-            <IconButton icon={<MoreVertical size={20} className="text-gray_5" />} />
+            <div ref={menuRef}>
+                <IconButton
+                    onClick={() => setOpen(o => !o)}
+                    icon={<MoreVertical size={18} className="text-gray_5" />}
+                />
+                {open && (
+                    <div className="absolute right-2 top-12 bg-white border rounded-xl shadow-lg z-10 min-w-[120px]">
+                        <button
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 text-body2"
+                            onClick={() => {
+                                setOpen(false);
+                                onEdit(item.id);
+                            }}
+                        >
+                            변경
+                        </button>
+                        <button
+                            className="w-full text-left px-4 py-2 hover:bg-gray-50 text-error text-body2"
+                            onClick={() => {
+                                setOpen(false);
+                                onDelete(item.id);
+                            }}
+                        >
+                            삭제
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
@@ -131,7 +183,7 @@ const HeroCard = ({
                         <p className="text-body1-bold text-gray_9">
                             {item.title}까지
                             <br />
-                            <span className="text-primary">{dday.replace('D-', '')}일 </span>
+                            <span className="text-[#3A6FF8]">{dday.replace('D-', '')}일 </span>
                             <span>남았어요</span>
                         </p>
                     </div>
@@ -165,6 +217,8 @@ const SchedulePage = () => {
     const [showAllCompleted, setShowAllCompleted] = useState(false);
     const user = useAuthStore(state => state.user);
     const [openAdd, setOpenAdd] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     // 데이터 로드
     useEffect(() => {
@@ -191,12 +245,26 @@ const SchedulePage = () => {
         };
     }, [schedules, category]);
 
+    const editingItem = useMemo(
+        () => schedules.find(s => s.id === editingId) || null,
+        [schedules, editingId]
+    );
+
     const handleComplete = async (id: string) => {
         try {
             await markScheduleCompleted(id, true);
             setSchedules(prev =>
                 prev.map(it => (it.id === id ? { ...it, isCompleted: true } : it))
             );
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        try {
+            await deleteSchedule(id);
+            setSchedules(prev => prev.filter(it => it.id !== id));
         } catch (e) {
             console.error(e);
         }
@@ -210,12 +278,23 @@ const SchedulePage = () => {
             <CategoryTabs active={category} onChange={setCategory} />
 
             {!isEmpty && heroItem && (
-                <HeroCard
-                    item={heroItem}
-                    category={category}
-                    onChangeClick={() => console.log('일정변경', heroItem.id)}
-                    onCompleteClick={() => handleComplete(heroItem.id)}
-                />
+                <>
+                    <div className="px-6 mt-2">
+                        <p className="text-sm text-gray_7">임박한 일정</p>
+                        <p className="text-lg font-semibold text-gray_9">
+                            {formatDateKorean(heroItem.date)}
+                        </p>
+                    </div>
+                    <HeroCard
+                        item={heroItem}
+                        category={category}
+                        onChangeClick={() => {
+                            setEditingId(heroItem.id);
+                            setOpenEdit(true);
+                        }}
+                        onCompleteClick={() => handleComplete(heroItem.id)}
+                    />
+                </>
             )}
 
             {isEmpty ? (
@@ -242,10 +321,20 @@ const SchedulePage = () => {
             ) : (
                 <>
                     <SectionHeader title="다가올 일정" />
-                    <div className="px-6 flex flex-col gap-3">
-                        {(showAllUpcoming ? upcomingItems : upcomingItems.slice(1, 4)).map(item => (
-                            <ScheduleRow key={item.id} item={item} />
-                        ))}
+                    <div className="px-6 flex flex-col gap-[6px]">
+                        {(showAllUpcoming ? upcomingItems.slice(1) : upcomingItems.slice(1, 4)).map(
+                            item => (
+                                <ScheduleRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={id => {
+                                        setEditingId(id);
+                                        setOpenEdit(true);
+                                    }}
+                                    onDelete={handleDelete}
+                                />
+                            )
+                        )}
                         {upcomingItems.length > 4 && (
                             <div className="flex justify-center">
                                 <IconButton
@@ -264,7 +353,15 @@ const SchedulePage = () => {
                     <div className="px-6 flex flex-col gap-3">
                         {(showAllCompleted ? completedItems : completedItems.slice(0, 3)).map(
                             item => (
-                                <ScheduleRow key={item.id} item={item} />
+                                <ScheduleRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={id => {
+                                        setEditingId(id);
+                                        setOpenEdit(true);
+                                    }}
+                                    onDelete={handleDelete}
+                                />
                             )
                         )}
                         {completedItems.length > 3 && (
@@ -305,13 +402,44 @@ const SchedulePage = () => {
                     const newItem = await createSchedule({
                         userId: user.id,
                         category,
-                        title: category === 'health' ? '건강 일정' : '케어 일정',
+                        title: form.title || (category === 'health' ? '건강 일정' : '케어 일정'),
                         date: form.date,
                         location: form.location || undefined,
                         notificationsEnabled: form.notificationsEnabled,
                         reminderMinutes: form.reminderMinutes,
                     });
                     setSchedules(prev => [...prev, newItem]);
+                }}
+            />
+
+            <EditScheduleModal
+                open={openEdit}
+                onClose={() => {
+                    setOpenEdit(false);
+                    setEditingId(null);
+                }}
+                defaultValues={{
+                    title: editingItem?.title ?? heroItem?.title ?? '',
+                    date:
+                        editingItem?.date ??
+                        heroItem?.date ??
+                        new Date().toISOString().split('T')[0],
+                    location: editingItem?.location ?? heroItem?.location ?? '',
+                    notificationsEnabled:
+                        editingItem?.notificationsEnabled ?? heroItem?.notificationsEnabled ?? true,
+                    reminderMinutes:
+                        editingItem?.reminderMinutes ?? heroItem?.reminderMinutes ?? 60,
+                }}
+                onSubmit={async form => {
+                    if (!editingId) return;
+                    const updated = await updateSchedule(editingId, {
+                        title: form.title,
+                        date: form.date,
+                        location: form.location || undefined,
+                        notificationsEnabled: form.notificationsEnabled,
+                        reminderMinutes: form.reminderMinutes,
+                    });
+                    setSchedules(prev => prev.map(it => (it.id === updated.id ? updated : it)));
                 }}
             />
         </div>

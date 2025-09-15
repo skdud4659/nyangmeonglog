@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-export type AddScheduleForm = {
+export type EditScheduleForm = {
     title: string;
     date: string; // YYYY-MM-DD
     location: string;
@@ -14,33 +14,33 @@ export type AddScheduleForm = {
 type Props = {
     open: boolean;
     onClose: () => void;
-    onSubmit: (form: AddScheduleForm) => Promise<void> | void;
-    defaultDate?: string; // prefill
+    onSubmit: (form: EditScheduleForm) => Promise<void> | void;
+    defaultValues: EditScheduleForm;
 };
 
 const minuteOptions = [0, 5, 10, 15, 30, 60, 120, 1440];
 
-const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
+const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) => {
     const todayIso = useMemo(() => new Date().toISOString().split('T')[0], []);
-    const [form, setForm] = useState<AddScheduleForm>({
-        title: '',
-        date: defaultDate ?? todayIso,
-        location: '',
-        notificationsEnabled: true,
-        reminderMinutes: 60,
+    const [form, setForm] = useState<EditScheduleForm>({
+        title: defaultValues?.title ?? '',
+        date: defaultValues?.date ?? todayIso,
+        location: defaultValues?.location ?? '',
+        notificationsEnabled: defaultValues?.notificationsEnabled ?? true,
+        reminderMinutes: defaultValues?.reminderMinutes ?? 60,
     });
 
     useEffect(() => {
         if (open) {
             setForm({
-                title: '',
-                date: defaultDate ?? todayIso,
-                location: '',
-                notificationsEnabled: true,
-                reminderMinutes: 60,
+                title: defaultValues?.title ?? '',
+                date: defaultValues?.date ?? todayIso,
+                location: defaultValues?.location ?? '',
+                notificationsEnabled: defaultValues?.notificationsEnabled ?? true,
+                reminderMinutes: defaultValues?.reminderMinutes ?? 60,
             });
         }
-    }, [open, defaultDate, todayIso]);
+    }, [open, defaultValues, todayIso]);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,7 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
             await onSubmit(form);
             onClose();
         } catch (e: any) {
-            const msg = e?.message || '등록 중 오류가 발생했어요';
+            const msg = e?.message || '수정 중 오류가 발생했어요';
             setError(msg);
         } finally {
             setSubmitting(false);
@@ -81,7 +81,7 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
                     >
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-h4 text-gray_9">일정 등록</h3>
+                                <h3 className="text-h4 text-gray_9">일정 변경</h3>
                                 <button onClick={onClose}>
                                     <X className="text-gray_6" />
                                 </button>
@@ -196,7 +196,7 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
                                     disabled={submitting}
                                 />
                                 <Button
-                                    label={submitting ? '등록 중...' : '등록'}
+                                    label={submitting ? '저장 중...' : '저장'}
                                     onClick={handleSubmit}
                                     disabled={submitting}
                                 />
@@ -209,4 +209,4 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
     );
 };
 
-export default AddScheduleModal;
+export default EditScheduleModal;
