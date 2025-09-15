@@ -31,3 +31,8 @@ export const usePetStore = create<PetState & PetActions>((set, get) => ({
     },
     setActivePetId: (petId: string) => set({ activePetId: petId }),
 }));
+
+export const useActivePet = (): PetItem | undefined => {
+    const { pets, activePetId } = usePetStore();
+    return pets.find(p => p.id === activePetId);
+};

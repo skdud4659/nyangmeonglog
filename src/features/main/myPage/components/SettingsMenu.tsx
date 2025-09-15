@@ -2,7 +2,7 @@ import { ROUTE_PATH } from '@/routes/constant';
 import { useAuthStore } from '@/shared/store/authStore';
 import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Bell, ChevronRight, LogOut, Settings, User, type LucideIcon } from 'lucide-react';
+import { ChevronRight, LogOut, Settings, User, type LucideIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 
 type MenuEntry = {
@@ -53,9 +53,17 @@ export const SettingsMenu = () => {
     };
 
     const menus: MenuEntry[] = [
-        { icon: User, label: '동물정보 수정' },
-        { icon: Bell, label: '알림설정' },
-        { icon: Settings, label: '모드 변경' },
+        {
+            icon: User,
+            label: '동물정보 수정',
+            onClick: () => navigate({ to: '/main/myPage/petForm' }),
+        },
+        // { icon: Bell, label: '알림설정' },
+        {
+            icon: Settings,
+            label: '모드 변경',
+            onClick: () => navigate({ to: '/main/myPage/mode' }),
+        },
         {
             icon: LogOut,
             label: '로그아웃',

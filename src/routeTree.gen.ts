@@ -14,10 +14,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
 import { Route as MainWalkRouteImport } from './routes/main/walk'
 import { Route as MainScheduleRouteImport } from './routes/main/schedule'
-import { Route as MainMyPageRouteImport } from './routes/main/myPage'
 import { Route as MainHomeRouteImport } from './routes/main/home'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as MainMyPageIndexRouteImport } from './routes/main/myPage/index'
+import { Route as MainMyPagePetFormRouteImport } from './routes/main/myPage/petForm'
+import { Route as MainMyPageModeRouteImport } from './routes/main/myPage/mode'
 
 const R404Route = R404RouteImport.update({
   id: '/$404',
@@ -44,11 +46,6 @@ const MainScheduleRoute = MainScheduleRouteImport.update({
   path: '/main/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainMyPageRoute = MainMyPageRouteImport.update({
-  id: '/main/myPage',
-  path: '/main/myPage',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MainHomeRoute = MainHomeRouteImport.update({
   id: '/main/home',
   path: '/main/home',
@@ -64,6 +61,21 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MainMyPageIndexRoute = MainMyPageIndexRouteImport.update({
+  id: '/main/myPage/',
+  path: '/main/myPage/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainMyPagePetFormRoute = MainMyPagePetFormRouteImport.update({
+  id: '/main/myPage/petForm',
+  path: '/main/myPage/petForm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainMyPageModeRoute = MainMyPageModeRouteImport.update({
+  id: '/main/myPage/mode',
+  path: '/main/myPage/mode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,10 +83,12 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
-  '/main/myPage': typeof MainMyPageRoute
   '/main/schedule': typeof MainScheduleRoute
   '/main/walk': typeof MainWalkRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/main/myPage/mode': typeof MainMyPageModeRoute
+  '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/myPage': typeof MainMyPageIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,10 +96,12 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
-  '/main/myPage': typeof MainMyPageRoute
   '/main/schedule': typeof MainScheduleRoute
   '/main/walk': typeof MainWalkRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/main/myPage/mode': typeof MainMyPageModeRoute
+  '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/myPage': typeof MainMyPageIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,10 +110,12 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
-  '/main/myPage': typeof MainMyPageRoute
   '/main/schedule': typeof MainScheduleRoute
   '/main/walk': typeof MainWalkRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/main/myPage/mode': typeof MainMyPageModeRoute
+  '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/myPage/': typeof MainMyPageIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,10 +125,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/main/home'
-    | '/main/myPage'
     | '/main/schedule'
     | '/main/walk'
     | '/onboarding'
+    | '/main/myPage/mode'
+    | '/main/myPage/petForm'
+    | '/main/myPage'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,10 +138,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/main/home'
-    | '/main/myPage'
     | '/main/schedule'
     | '/main/walk'
     | '/onboarding'
+    | '/main/myPage/mode'
+    | '/main/myPage/petForm'
+    | '/main/myPage'
   id:
     | '__root__'
     | '/'
@@ -129,10 +151,12 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/main/home'
-    | '/main/myPage'
     | '/main/schedule'
     | '/main/walk'
     | '/onboarding/'
+    | '/main/myPage/mode'
+    | '/main/myPage/petForm'
+    | '/main/myPage/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -141,10 +165,12 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   MainHomeRoute: typeof MainHomeRoute
-  MainMyPageRoute: typeof MainMyPageRoute
   MainScheduleRoute: typeof MainScheduleRoute
   MainWalkRoute: typeof MainWalkRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
+  MainMyPageModeRoute: typeof MainMyPageModeRoute
+  MainMyPagePetFormRoute: typeof MainMyPagePetFormRoute
+  MainMyPageIndexRoute: typeof MainMyPageIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,13 +210,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/main/myPage': {
-      id: '/main/myPage'
-      path: '/main/myPage'
-      fullPath: '/main/myPage'
-      preLoaderRoute: typeof MainMyPageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/main/home': {
       id: '/main/home'
       path: '/main/home'
@@ -212,6 +231,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/main/myPage/': {
+      id: '/main/myPage/'
+      path: '/main/myPage'
+      fullPath: '/main/myPage'
+      preLoaderRoute: typeof MainMyPageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/myPage/petForm': {
+      id: '/main/myPage/petForm'
+      path: '/main/myPage/petForm'
+      fullPath: '/main/myPage/petForm'
+      preLoaderRoute: typeof MainMyPagePetFormRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/myPage/mode': {
+      id: '/main/myPage/mode'
+      path: '/main/myPage/mode'
+      fullPath: '/main/myPage/mode'
+      preLoaderRoute: typeof MainMyPageModeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -221,10 +261,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   MainHomeRoute: MainHomeRoute,
-  MainMyPageRoute: MainMyPageRoute,
   MainScheduleRoute: MainScheduleRoute,
   MainWalkRoute: MainWalkRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
+  MainMyPageModeRoute: MainMyPageModeRoute,
+  MainMyPagePetFormRoute: MainMyPagePetFormRoute,
+  MainMyPageIndexRoute: MainMyPageIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

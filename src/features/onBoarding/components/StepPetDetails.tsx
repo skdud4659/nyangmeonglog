@@ -35,14 +35,14 @@ const StepPetDetails = ({ pet, updatePet, index }: StepPetDetailsProps) => {
                 </div>
                 <GenderSelection value={pet.gender} onChange={gender => updatePet({ gender })} />
                 <InputField
-                    label="생년월일"
+                    label="태어난 날"
                     type="date"
                     value={pet.birthDate || ''}
                     onChange={e => updatePet({ birthDate: e.target.value })}
                     showClearButton={false}
                 />
                 <InputField
-                    label="입양일"
+                    label="나와 함께하기 시작한 날"
                     type="date"
                     value={pet.adoptionDate || ''}
                     onChange={e => updatePet({ adoptionDate: e.target.value })}

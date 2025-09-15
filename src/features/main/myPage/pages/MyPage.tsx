@@ -1,25 +1,34 @@
 import PetInfo from '@/features/main/myPage/components/PetInfo';
 import PetProfile from '@/features/main/myPage/components/PetProfile';
 import { SettingsMenu } from '@/features/main/myPage/components/SettingsMenu';
+import { useActivePet, usePetStore } from '@/shared/store/petStore';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 const MyPage = () => {
-    const petData = {
-        name: '달이',
-        birth: '2014-04-10',
-        length: '8cm',
-        weight: '3.5kg',
-        breed: '토이푸들',
-        photo: '/images/dog1.jpg',
-        companions: [
-            { id: 'pet2', photo: '/images/cat1.jpg' },
-            { id: 'pet3', photo: '/images/dog2.jpg' },
-        ],
+    const navigate = useNavigate();
+    const loadPets = usePetStore(s => s.loadPetsForCurrentUser);
+    const pets = usePetStore(s => s.pets);
+    const setActivePetId = usePetStore(s => s.setActivePetId);
+    const activePet = useActivePet();
+
+    useEffect(() => {
+        loadPets();
+    }, [loadPets]);
+
+    const handleAddPet = () => {
+        navigate({ to: '/main/myPage/petForm' });
     };
 
     return (
         <div className="p-6">
-            <PetProfile pet={petData} />
-            <PetInfo pet={petData} />
+            <PetProfile
+                pets={pets}
+                activePet={activePet}
+                onSelectPet={setActivePetId}
+                onAddPet={handleAddPet}
+            />
+            <PetInfo pet={activePet} />
             <SettingsMenu />
         </div>
     );
