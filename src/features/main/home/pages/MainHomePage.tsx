@@ -1,4 +1,3 @@
-import { getUserPets, type PetItem } from '@/features/main/home/api/petsApi';
 import { getSimpleRecordsForMonth } from '@/features/main/home/api/recordsApi';
 import { CalendarGrid } from '@/features/main/home/components/CalendarGrid';
 import CalendarHeader from '@/features/main/home/components/CalendarHeader';
@@ -9,6 +8,7 @@ import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import { initPushForUser } from '@/shared/lib/push';
 import { useAuthStore } from '@/shared/store/authStore';
+import { usePetStore } from '@/shared/store/petStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -21,8 +21,10 @@ const MainHomePage = () => {
     const [selectedDate, setSelectedDate] = useState<number | null>(null);
     const [records, setRecords] = useState<SimpleRecord[]>([]);
 
-    const [pets, setPets] = useState<PetItem[]>([]);
-    const [activePetId, setActivePetId] = useState<string | null>(null);
+    const pets = usePetStore(state => state.pets);
+    const activePetId = usePetStore(state => state.activePetId);
+    const setActivePetId = usePetStore(state => state.setActivePetId);
+    const loadPetsForCurrentUser = usePetStore(state => state.loadPetsForCurrentUser);
     const [showPetSelector, setShowPetSelector] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -104,17 +106,10 @@ const MainHomePage = () => {
 
     // 사용자 펫 목록 로드 및 활성 펫 설정
     useEffect(() => {
-        const run = async () => {
-            if (!user?.id) return;
-            const list = await getUserPets(user.id);
-            setPets(list);
-            if (!activePetId && list.length > 0) {
-                setActivePetId(list[0].id);
-            }
-            // Initialize push subscription for the user (non-blocking)
-            initPushForUser(user.id);
-        };
-        run();
+        if (!user?.id) return;
+        loadPetsForCurrentUser();
+        // Initialize push subscription for the user (non-blocking)
+        initPushForUser(user.id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id]);
 

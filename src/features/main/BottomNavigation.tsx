@@ -1,17 +1,15 @@
 import { ROUTE_PATH } from '@/routes/constant';
+import { usePetStore } from '@/shared/store/petStore';
 import { Link, useLocation } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { Calendar, ClipboardClock, PawPrint, User } from 'lucide-react';
 
 const BottomNavigation = () => {
-    const navItems = [
-        {
-            icon: PawPrint,
-            label: '펫',
-            isActive: false,
-            hasNotification: false,
-            to: ROUTE_PATH.MAIN.WALK,
-        },
+    const pets = usePetStore(state => state.pets);
+    const activePetId = usePetStore(state => state.activePetId);
+    const activePet = pets.find(p => p.id === activePetId);
+
+    const baseItems = [
         {
             icon: Calendar,
             label: '캘린더',
@@ -34,6 +32,20 @@ const BottomNavigation = () => {
             to: ROUTE_PATH.MAIN.MY_PAGE,
         },
     ];
+
+    const navItems =
+        activePet?.species === 'dog'
+            ? [
+                  {
+                      icon: PawPrint,
+                      label: '펫',
+                      isActive: false,
+                      hasNotification: false,
+                      to: ROUTE_PATH.MAIN.WALK,
+                  },
+                  ...baseItems,
+              ]
+            : baseItems;
 
     const { pathname } = useLocation();
     const isActive = (path: string) => pathname === path;
