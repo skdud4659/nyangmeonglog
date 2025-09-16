@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { z, type ZodIssue } from 'zod';
 
 export const useSignupForm = () => {
-    // 데이터 임시 입력
     const [form, setForm] = useState<SignupFormData>({
-        email: 'skdud4659@gmail.com',
-        password: 'Test@1234',
-        confirmPassword: 'Test@1234',
+        email: '',
+        password: '',
+        confirmPassword: '',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);

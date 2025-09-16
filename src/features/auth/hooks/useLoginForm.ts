@@ -10,10 +10,9 @@ export const loginSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const useLoginForm = () => {
-    // 데이터 임시 입력
     const [form, setForm] = useState<LoginFormData>({
-        email: 'skdud4659@gmail.com',
-        password: 'Test@1234',
+        email: '',
+        password: '',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);

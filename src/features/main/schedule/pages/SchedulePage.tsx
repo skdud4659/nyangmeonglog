@@ -13,11 +13,11 @@ import EditScheduleModal from '@/features/main/schedule/components/EditScheduleM
 import HeroCard from '@/features/main/schedule/components/HeroCard';
 import ScheduleRow from '@/features/main/schedule/components/ScheduleRow';
 import SectionHeader from '@/features/main/schedule/components/SectionHeader';
-import { formatDateKorean } from '@/features/main/schedule/lib/date';
 import DentalBgIcon from '@/shared/assets/icons/dentalIcon.svg?react';
 import InjectionBgIcon from '@/shared/assets/icons/injectionIcon.svg?react';
 import PawPrintIcon from '@/shared/assets/icons/pawPrintIcon.svg?react';
 import IconButton from '@/shared/components/atoms/IconButton';
+import { formatDateKorean } from '@/shared/lib/date';
 import { useAuthStore } from '@/shared/store/authStore';
 import { usePetStore } from '@/shared/store/petStore';
 import { AnimatePresence, motion } from 'framer-motion';

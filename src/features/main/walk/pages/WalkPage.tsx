@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import ConfirmModal from '@/features/main/walk/components/ConfirmModal';
 import SaveWalkButton from '@/features/main/walk/components/SaveWalkButton';
+import ConfirmModal from '@/shared/components/molecules/ConfirmModal';
 import { usePetStore } from '@/shared/store/petStore';
 import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -126,6 +126,16 @@ const WalkPage = () => {
             }
         };
         init();
+        return () => {
+            if (watchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+                watchIdRef.current = null;
+            }
+            if (timerRef.current !== null) {
+                window.clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
     }, []);
 
     useEffect(() => {

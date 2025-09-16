@@ -1,8 +1,8 @@
 import type { ScheduleItem } from '@/features/main/schedule/api/schedulesApi';
-import { formatDateKorean, getDday } from '@/features/main/schedule/lib/date';
 import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import IconButton from '@/shared/components/atoms/IconButton';
+import { formatDateKorean, getDday } from '@/shared/lib/date';
 import { MoreVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 

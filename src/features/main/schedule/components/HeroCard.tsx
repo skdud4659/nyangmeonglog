@@ -1,8 +1,8 @@
 import type { ScheduleCategory, ScheduleItem } from '@/features/main/schedule/api/schedulesApi';
-import { getDday } from '@/features/main/schedule/lib/date';
 import DentalBgIcon from '@/shared/assets/icons/dentalIcon.svg?react';
 import InjectionBgIcon from '@/shared/assets/icons/injectionIcon.svg?react';
 import Button from '@/shared/components/atoms/Button';
+import { getDday } from '@/shared/lib/date';
 
 const HeroCard = ({
     item,

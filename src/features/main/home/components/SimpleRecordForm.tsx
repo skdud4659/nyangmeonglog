@@ -1,7 +1,9 @@
+import { getPetById, updatePet } from '@/features/main/home/api/petsApi';
 import { upsertSimpleRecord } from '@/features/main/home/api/recordsApi';
 import { eventIconMap } from '@/features/main/home/lib/icons';
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import AddPhotoIcon from '@/shared/assets/icons/addPhotoIcon.svg?react';
+import SheetHeader from '@/shared/components/molecules/SheetHeader';
 import { useAuthStore } from '@/shared/store/authStore';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -87,12 +89,30 @@ const RecordForm = ({
         initialRecord?.pee,
     ]);
 
-    // 기록 변경 시 초기 supplements 동기화
+    // 활성 펫 영양제 목록 서버 동기화 및 수정모드 초기값 적용
     useEffect(() => {
-        // 기존 기록 기반 supplements는 삭제됨. 필요하면 펫 프로필에서 불러오세요.
-        setSupplements([]);
-        setSelectedSupplementNames(new Set());
-    }, [initialRecord?.id]);
+        let cancelled = false;
+        const sync = async () => {
+            try {
+                const pet = await getPetById(petId);
+                const list = pet?.supplements ?? [];
+                if (!cancelled) {
+                    setSupplements(list);
+                    setSelectedSupplementNames(prev => {
+                        if (prev.size > 0) return prev;
+                        const used = initialRecord?.supplements ?? [];
+                        return used.length > 0 ? new Set(used) : new Set();
+                    });
+                }
+            } catch {
+                // ignore
+            }
+        };
+        sync();
+        return () => {
+            cancelled = true;
+        };
+    }, [petId, initialRecord?.supplements]);
 
     const toggleSupplement = (name: string) => {
         setSelectedSupplementNames(prev => {
@@ -106,7 +126,11 @@ const RecordForm = ({
     const handleAddSupplement = async () => {
         const name = newSupplementName.trim();
         if (name.length === 0) return;
-        setSupplements(prev => (prev.includes(name) ? prev : [...prev, name]));
+        setSupplements(prev => {
+            const next = prev.includes(name) ? prev : [...prev, name];
+            updatePet(petId, { supplements: next }).catch(() => {});
+            return next;
+        });
         setSelectedSupplementNames(prev => new Set([...Array.from(prev), name]));
         setNewSupplementName('');
     };
@@ -143,20 +167,12 @@ const RecordForm = ({
 
     return (
         <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-bold">
-                    {currentMonth + 1}월 {selectedDate}일
-                </h2>
-                <div className="flex items-center gap-3">
-                    <button className="text-gray-400 font-medium" onClick={onClose}>
-                        닫기
-                    </button>
-                    <button className="text-red-400 font-medium" onClick={handleSave}>
-                        저장
-                    </button>
-                </div>
-            </div>
+            <SheetHeader
+                title={`${currentMonth + 1}월 ${selectedDate}일`}
+                onClose={onClose}
+                onPrimary={handleSave}
+                primaryLabel="저장"
+            />
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8">

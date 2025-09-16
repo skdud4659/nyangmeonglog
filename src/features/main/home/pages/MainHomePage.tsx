@@ -64,8 +64,8 @@ const MainHomePage = () => {
                         !!r.health.vaccination?.photoUrl ||
                         !!r.health.checkup?.note ||
                         !!r.health.checkup?.photoUrl);
-                const hasSupplements = Array.isArray((r as any).supplements)
-                    ? ((r as any).supplements as string[]).length > 0
+                const hasSupplements = Array.isArray(r.supplements)
+                    ? r.supplements.length > 0
                     : false;
 
                 // Order (row-major for 2-col grid):

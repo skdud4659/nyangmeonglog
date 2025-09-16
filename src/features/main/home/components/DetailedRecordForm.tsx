@@ -4,6 +4,7 @@ import { eventIconMap } from '@/features/main/home/lib/icons';
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import AddPhotoIcon from '@/shared/assets/icons/addPhotoIcon.svg?react';
 import ClearIcon from '@/shared/assets/icons/clearIcon.svg?react';
+import SheetHeader from '@/shared/components/molecules/SheetHeader';
 import { useAuthStore } from '@/shared/store/authStore';
 import { usePetStore } from '@/shared/store/petStore';
 import { useEffect, useMemo, useState } from 'react';
@@ -227,19 +228,12 @@ const DetailedRecordForm = ({
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-bold">
-                    {currentMonth + 1}월 {selectedDate}일
-                </h2>
-                <div className="flex items-center gap-3">
-                    <button className="text-gray-400 font-medium" onClick={onClose}>
-                        닫기
-                    </button>
-                    <button className="text-red-400 font-medium" onClick={handleSave}>
-                        저장
-                    </button>
-                </div>
-            </div>
+            <SheetHeader
+                title={`${currentMonth + 1}월 ${selectedDate}일`}
+                onClose={onClose}
+                onPrimary={handleSave}
+                primaryLabel="저장"
+            />
 
             <div className="p-4 grid grid-cols-6 overflow-x-auto border-b">
                 {tabs.map(t => (
