@@ -58,10 +58,8 @@ const RecordForm = ({
     const [poop, setPoop] = useState<boolean>(initialRecord?.poop ?? false);
     const [pee, setPee] = useState<boolean>(initialRecord?.pee ?? false);
 
-    const [supplements, setSupplements] = useState<string[]>(initialRecord?.supplements ?? []);
-    const [selectedSupplementNames, setSelectedSupplementNames] = useState<Set<string>>(
-        new Set(initialRecord?.supplements ?? [])
-    );
+    const [supplements, setSupplements] = useState<string[]>([]);
+    const [selectedSupplementNames, setSelectedSupplementNames] = useState<Set<string>>(new Set());
     const [newSupplementName, setNewSupplementName] = useState<string>('');
     const [extraSelected, setExtraSelected] = useState<Record<string, boolean>>({
         brush: initialRecord?.extras?.brush ?? false,
@@ -91,9 +89,10 @@ const RecordForm = ({
 
     // 기록 변경 시 초기 supplements 동기화
     useEffect(() => {
-        setSupplements(initialRecord?.supplements ?? []);
-        setSelectedSupplementNames(new Set(initialRecord?.supplements ?? []));
-    }, [initialRecord?.id, initialRecord?.supplements]);
+        // 기존 기록 기반 supplements는 삭제됨. 필요하면 펫 프로필에서 불러오세요.
+        setSupplements([]);
+        setSelectedSupplementNames(new Set());
+    }, [initialRecord?.id]);
 
     const toggleSupplement = (name: string) => {
         setSelectedSupplementNames(prev => {
@@ -126,7 +125,7 @@ const RecordForm = ({
             snack,
             poop,
             pee,
-            supplements: Array.from(selectedSupplementNames),
+            // supplements removed: now managed on pet profile
             extras: {
                 brush: !!extraSelected.brush,
                 bath: !!extraSelected.bath,

@@ -7,7 +7,7 @@ export type SimpleRecord = {
     snack: boolean;
     poop: boolean;
     pee: boolean;
-    supplements?: string[];
+    supplements?: string[]; // 복용한 영양제 목록(0개 이상)
     extras?: {
         brush: boolean;
         bath: boolean;

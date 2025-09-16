@@ -1,6 +1,7 @@
 import { getSimpleRecordsForMonth } from '@/features/main/home/api/recordsApi';
 import { CalendarGrid } from '@/features/main/home/components/CalendarGrid';
 import CalendarHeader from '@/features/main/home/components/CalendarHeader';
+import DetailedRecordForm from '@/features/main/home/components/DetailedRecordForm';
 import SimpleRecordForm from '@/features/main/home/components/SimpleRecordForm';
 import type { EventCategory, EventItem } from '@/features/main/home/types/event';
 import type { SimpleRecord } from '@/features/main/home/types/record';
@@ -9,6 +10,7 @@ import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import { initPushForUser } from '@/shared/lib/push';
 import { useAuthStore } from '@/shared/store/authStore';
 import { usePetStore } from '@/shared/store/petStore';
+import { useSettingsStore } from '@/shared/store/settingsStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -28,6 +30,8 @@ const MainHomePage = () => {
     const [showPetSelector, setShowPetSelector] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const appMode = useSettingsStore(s => s.mode);
+    const syncModeFromProfile = useSettingsStore(s => s.syncModeFromProfile);
     const [showNotifications, setShowNotifications] = useState(false);
 
     const activePet = pets.find(pet => pet.id === activePetId);
@@ -60,7 +64,9 @@ const MainHomePage = () => {
                         !!r.health.vaccination?.photoUrl ||
                         !!r.health.checkup?.note ||
                         !!r.health.checkup?.photoUrl);
-                const hasSupplements = Array.isArray(r.supplements) && r.supplements.length > 0;
+                const hasSupplements = Array.isArray((r as any).supplements)
+                    ? ((r as any).supplements as string[]).length > 0
+                    : false;
 
                 // Order (row-major for 2-col grid):
                 // [feed, snack], [poop, pee], [water, grooming], [medicine, checkup]
@@ -110,6 +116,8 @@ const MainHomePage = () => {
         loadPetsForCurrentUser();
         // Initialize push subscription for the user (non-blocking)
         initPushForUser(user.id);
+        // sync mode from profile on login
+        syncModeFromProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id]);
 
@@ -123,9 +131,9 @@ const MainHomePage = () => {
                     className="w-10 h-10 rounded-full border mr-3"
                     onClick={() => setShowPetSelector(true)}
                 >
-                    {activePet?.photo_url ? (
+                    {activePet?.photoUrl ? (
                         <img
-                            src={activePet.photo_url}
+                            src={activePet.photoUrl}
                             alt={activePet.name}
                             className="w-full h-full rounded-full object-cover"
                         />
@@ -194,9 +202,9 @@ const MainHomePage = () => {
                                     setShowPetSelector(false);
                                 }}
                             >
-                                {pet.photo_url ? (
+                                {pet.photoUrl ? (
                                     <img
-                                        src={pet.photo_url}
+                                        src={pet.photoUrl}
                                         alt={pet.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -232,32 +240,62 @@ const MainHomePage = () => {
                             className="absolute bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-lg max-w-md mx-auto"
                             style={{ height: '95%' }}
                         >
-                            {activePetId && (
-                                <SimpleRecordForm
-                                    selectedDate={selectedDate ?? today.getDate()}
-                                    currentMonth={currentMonth}
-                                    currentYear={currentYear}
-                                    onClose={() => setIsFormOpen(false)}
-                                    petId={activePetId}
-                                    initialRecord={recordForDate}
-                                    onSaved={saved => {
-                                        setRecords(prev => {
-                                            const exists = prev.find(
-                                                r =>
-                                                    r.date === saved.date && r.petId === saved.petId
-                                            );
-                                            if (exists) {
-                                                return prev.map(r =>
-                                                    r.date === saved.date && r.petId === saved.petId
-                                                        ? saved
-                                                        : r
+                            {activePetId &&
+                                (appMode === 'detail' ? (
+                                    <DetailedRecordForm
+                                        selectedDate={selectedDate ?? today.getDate()}
+                                        currentMonth={currentMonth}
+                                        currentYear={currentYear}
+                                        onClose={() => setIsFormOpen(false)}
+                                        petId={activePetId}
+                                        initialRecord={recordForDate}
+                                        onSaved={saved => {
+                                            setRecords(prev => {
+                                                const exists = prev.find(
+                                                    r =>
+                                                        r.date === saved.date &&
+                                                        r.petId === saved.petId
                                                 );
-                                            }
-                                            return [...prev, saved];
-                                        });
-                                    }}
-                                />
-                            )}
+                                                if (exists) {
+                                                    return prev.map(r =>
+                                                        r.date === saved.date &&
+                                                        r.petId === saved.petId
+                                                            ? saved
+                                                            : r
+                                                    );
+                                                }
+                                                return [...prev, saved];
+                                            });
+                                        }}
+                                    />
+                                ) : (
+                                    <SimpleRecordForm
+                                        selectedDate={selectedDate ?? today.getDate()}
+                                        currentMonth={currentMonth}
+                                        currentYear={currentYear}
+                                        onClose={() => setIsFormOpen(false)}
+                                        petId={activePetId}
+                                        initialRecord={recordForDate}
+                                        onSaved={saved => {
+                                            setRecords(prev => {
+                                                const exists = prev.find(
+                                                    r =>
+                                                        r.date === saved.date &&
+                                                        r.petId === saved.petId
+                                                );
+                                                if (exists) {
+                                                    return prev.map(r =>
+                                                        r.date === saved.date &&
+                                                        r.petId === saved.petId
+                                                            ? saved
+                                                            : r
+                                                    );
+                                                }
+                                                return [...prev, saved];
+                                            });
+                                        }}
+                                    />
+                                ))}
                         </motion.div>
                     </>
                 )}

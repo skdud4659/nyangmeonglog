@@ -11,6 +11,7 @@ type PetState = {
 type PetActions = {
     loadPetsForCurrentUser: () => Promise<void>;
     setActivePetId: (petId: string) => void;
+    updatePetInStore: (petId: string, updates: Partial<PetItem>) => void;
 };
 
 export const usePetStore = create<PetState & PetActions>((set, get) => ({
@@ -30,6 +31,10 @@ export const usePetStore = create<PetState & PetActions>((set, get) => ({
         }
     },
     setActivePetId: (petId: string) => set({ activePetId: petId }),
+    updatePetInStore: (petId: string, updates: Partial<PetItem>) =>
+        set(state => ({
+            pets: state.pets.map(p => (p.id === petId ? { ...p, ...updates } : p)),
+        })),
 }));
 
 export const useActivePet = (): PetItem | undefined => {

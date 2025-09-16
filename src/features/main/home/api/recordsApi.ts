@@ -10,7 +10,7 @@ export type UpsertSimpleRecordInput = {
     snack: boolean;
     poop: boolean;
     pee: boolean;
-    supplements?: string[];
+    supplements?: string[]; // 복용한 영양제 목록
     extras?: { brush: boolean; bath: boolean; grooming: boolean };
     health?: {
         spasm?: { note?: string; photoUrl?: string | null };
@@ -30,8 +30,7 @@ type SimpleRecordRow = {
     snack: boolean;
     poop: boolean;
     pee: boolean;
-    // jsonb
-    supplements?: unknown;
+    supplements?: unknown; // jsonb: string[]
     extras?: unknown;
     health?: unknown;
     created_at?: string;

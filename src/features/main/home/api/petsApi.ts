@@ -10,6 +10,7 @@ export type PetItem = {
     birthdate?: string | null; // YYYY-MM-DD
     adoptionDate?: string | null; // YYYY-MM-DD
     weightKg?: number | null;
+    supplements?: string[];
 };
 
 type DbPetRow = {
@@ -22,6 +23,7 @@ type DbPetRow = {
     birthdate?: string | null;
     adoption_date?: string | null;
     weight_kg?: number | null;
+    supplements?: unknown;
 };
 
 const mapRowToItem = (row: DbPetRow): PetItem => ({
@@ -34,18 +36,33 @@ const mapRowToItem = (row: DbPetRow): PetItem => ({
     birthdate: row.birthdate ?? null,
     adoptionDate: row.adoption_date ?? null,
     weightKg: typeof row.weight_kg === 'number' ? row.weight_kg : null,
+    supplements: (row.supplements as string[] | undefined) ?? [],
 });
 
 export async function getUserPets(userId: string): Promise<PetItem[]> {
     const { data, error } = await supabase
         .from('pets')
-        .select('id, name, species, photo_url, breed, gender, birthdate, adoption_date, weight_kg')
+        .select(
+            'id, name, species, photo_url, breed, gender, birthdate, adoption_date, weight_kg, supplements'
+        )
         .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
     if (error) throw error;
 
     return (data ?? []).map(mapRowToItem);
+}
+
+export async function getPetById(petId: string): Promise<PetItem | null> {
+    const { data, error } = await supabase
+        .from('pets')
+        .select(
+            'id, name, species, photo_url, breed, gender, birthdate, adoption_date, weight_kg, supplements'
+        )
+        .eq('id', petId)
+        .maybeSingle();
+    if (error) throw error;
+    return data ? mapRowToItem(data as DbPetRow) : null;
 }
 
 const uploadDataUrlToStorage = async (dataUrl: string): Promise<string> => {
@@ -84,6 +101,7 @@ export async function updatePet(
         weight_kg?: number | null;
         neutered?: boolean | null;
         photo?: string | null; // data URL or existing url
+        supplements?: string[];
     }
 ): Promise<void> {
     const payload: Partial<DbPetRow> = {};
@@ -96,6 +114,7 @@ export async function updatePet(
         payload.adoption_date = input.adoption_date ?? null;
     if (typeof input.weight_kg !== 'undefined') payload.weight_kg = input.weight_kg ?? null;
     if (typeof input.neutered !== 'undefined') payload.neutered = input.neutered ?? null;
+    if (typeof input.supplements !== 'undefined') (payload as any).supplements = input.supplements;
 
     if (typeof input.photo !== 'undefined' && input.photo) {
         if (input.photo.startsWith('data:')) {

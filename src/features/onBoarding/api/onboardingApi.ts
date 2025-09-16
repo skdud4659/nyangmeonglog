@@ -98,6 +98,7 @@ export const finalizeOnboarding = async (params: {
             console.warn('프로필 사진 업로드 실패:', e);
         }
     }
+    if (params.mode) updates.mode = params.mode;
     const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
     if (error) throw error;
 };
