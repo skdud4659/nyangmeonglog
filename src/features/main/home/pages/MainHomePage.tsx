@@ -2,6 +2,8 @@ import { getSimpleRecordsForMonth } from '@/features/main/home/api/recordsApi';
 import { CalendarGrid } from '@/features/main/home/components/CalendarGrid';
 import CalendarHeader from '@/features/main/home/components/CalendarHeader';
 import DetailedRecordForm from '@/features/main/home/components/DetailedRecordForm';
+import PetSelectorOverlay from '@/features/main/home/components/PetSelectorOverlay';
+import RecordFormSheet from '@/features/main/home/components/RecordFormSheet';
 import SimpleRecordForm from '@/features/main/home/components/SimpleRecordForm';
 import type { EventCategory, EventItem } from '@/features/main/home/types/event';
 import type { SimpleRecord } from '@/features/main/home/types/record';
@@ -11,7 +13,6 @@ import { initPushForUser } from '@/shared/lib/push';
 import { useAuthStore } from '@/shared/store/authStore';
 import { usePetStore } from '@/shared/store/petStore';
 import { useSettingsStore } from '@/shared/store/settingsStore';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 
 const MainHomePage = () => {
@@ -32,7 +33,6 @@ const MainHomePage = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const appMode = useSettingsStore(s => s.mode);
     const syncModeFromProfile = useSettingsStore(s => s.syncModeFromProfile);
-    const [showNotifications, setShowNotifications] = useState(false);
 
     const activePet = pets.find(pet => pet.id === activePetId);
     const filteredEvents = useMemo<EventItem[]>(() => {
@@ -92,6 +92,18 @@ const MainHomePage = () => {
 
     const user = useAuthStore(state => state.user);
 
+    const handleRecordSaved = (saved: SimpleRecord) => {
+        setRecords(prev => {
+            const exists = prev.find(r => r.date === saved.date && r.petId === saved.petId);
+            if (exists) {
+                return prev.map(r =>
+                    r.date === saved.date && r.petId === saved.petId ? saved : r
+                );
+            }
+            return [...prev, saved];
+        });
+    };
+
     const loadRecords = useMemo(
         () => async () => {
             if (!user?.id || !activePetId) return;
@@ -149,11 +161,6 @@ const MainHomePage = () => {
                     onMonthChange={setCurrentMonth}
                     onYearChange={setCurrentYear}
                 />
-                {/* Bell icon */}
-                {/* <button className="ml-auto relative" onClick={() => setShowNotifications(v => !v)}>
-                    <Bell size={20} className="text-gray_6" />
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full" />
-                </button> */}
             </div>
 
             {/* 달력 */}
@@ -183,152 +190,40 @@ const MainHomePage = () => {
                 </button>
             </div>
 
-            {/* 펫 선택 오버레이 */}
-            {showPetSelector && (
-                <div
-                    className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50"
-                    onClick={() => setShowPetSelector(false)}
-                >
-                    <div
-                        className="flex flex-col items-center space-y-4"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        {pets.map(pet => (
-                            <button
-                                key={pet.id}
-                                className="w-20 h-20 rounded-full overflow-hidden bg-white"
-                                onClick={() => {
-                                    setActivePetId(pet.id);
-                                    setShowPetSelector(false);
-                                }}
-                            >
-                                {pet.photoUrl ? (
-                                    <img
-                                        src={pet.photoUrl}
-                                        alt={pet.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : pet.species === 'dog' ? (
-                                    <DogIcon className="w-full h-full p-4 text-gray-400" />
-                                ) : (
-                                    <CatIcon className="w-full h-full p-4 text-gray-400" />
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+            <PetSelectorOverlay
+                isOpen={showPetSelector}
+                pets={pets}
+                onClose={() => setShowPetSelector(false)}
+                onSelect={petId => {
+                    setActivePetId(petId);
+                    setShowPetSelector(false);
+                }}
+            />
 
-            {/* Bottom sheet 폼 */}
-            <AnimatePresence>
-                {isFormOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-black/50 z-40 max-w-md mx-auto"
-                            onClick={() => setIsFormOpen(false)}
+            <RecordFormSheet isOpen={isFormOpen} onClose={() => setIsFormOpen(false)}>
+                {activePetId &&
+                    (appMode === 'detail' ? (
+                        <DetailedRecordForm
+                            selectedDate={selectedDate ?? today.getDate()}
+                            currentMonth={currentMonth}
+                            currentYear={currentYear}
+                            onClose={() => setIsFormOpen(false)}
+                            petId={activePetId}
+                            initialRecord={recordForDate}
+                            onSaved={handleRecordSaved}
                         />
-                        {/* Bottom Sheet */}
-                        <motion.div
-                            initial={{ y: '100%' }}
-                            animate={{ y: 0 }}
-                            exit={{ y: '100%' }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            className="absolute bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-lg max-w-md mx-auto"
-                            style={{ height: '95%' }}
-                        >
-                            {activePetId &&
-                                (appMode === 'detail' ? (
-                                    <DetailedRecordForm
-                                        selectedDate={selectedDate ?? today.getDate()}
-                                        currentMonth={currentMonth}
-                                        currentYear={currentYear}
-                                        onClose={() => setIsFormOpen(false)}
-                                        petId={activePetId}
-                                        initialRecord={recordForDate}
-                                        onSaved={saved => {
-                                            setRecords(prev => {
-                                                const exists = prev.find(
-                                                    r =>
-                                                        r.date === saved.date &&
-                                                        r.petId === saved.petId
-                                                );
-                                                if (exists) {
-                                                    return prev.map(r =>
-                                                        r.date === saved.date &&
-                                                        r.petId === saved.petId
-                                                            ? saved
-                                                            : r
-                                                    );
-                                                }
-                                                return [...prev, saved];
-                                            });
-                                        }}
-                                    />
-                                ) : (
-                                    <SimpleRecordForm
-                                        selectedDate={selectedDate ?? today.getDate()}
-                                        currentMonth={currentMonth}
-                                        currentYear={currentYear}
-                                        onClose={() => setIsFormOpen(false)}
-                                        petId={activePetId}
-                                        initialRecord={recordForDate}
-                                        onSaved={saved => {
-                                            setRecords(prev => {
-                                                const exists = prev.find(
-                                                    r =>
-                                                        r.date === saved.date &&
-                                                        r.petId === saved.petId
-                                                );
-                                                if (exists) {
-                                                    return prev.map(r =>
-                                                        r.date === saved.date &&
-                                                        r.petId === saved.petId
-                                                            ? saved
-                                                            : r
-                                                    );
-                                                }
-                                                return [...prev, saved];
-                                            });
-                                        }}
-                                    />
-                                ))}
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
-
-            {/* Notifications Popover */}
-            <AnimatePresence>
-                {showNotifications && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        className="absolute right-4 top-16 z-50 bg-white rounded-xl shadow-lg border p-3 w-72"
-                    >
-                        <div className="text-body2-bold mb-2">알림</div>
-                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {/* TODO: 실제 알림 데이터로 대체 */}
-                            <div className="text-sm text-gray_8">
-                                공지: 새로운 기능이 추가되었습니다.
-                            </div>
-                            <div className="text-sm text-gray_8">일정: 내일 접종 1시간 전 알림</div>
-                        </div>
-                        <div className="mt-3 text-right">
-                            <button
-                                className="text-label text-gray_6"
-                                onClick={() => setShowNotifications(false)}
-                            >
-                                닫기
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    ) : (
+                        <SimpleRecordForm
+                            selectedDate={selectedDate ?? today.getDate()}
+                            currentMonth={currentMonth}
+                            currentYear={currentYear}
+                            onClose={() => setIsFormOpen(false)}
+                            petId={activePetId}
+                            initialRecord={recordForDate}
+                            onSaved={handleRecordSaved}
+                        />
+                    ))}
+            </RecordFormSheet>
         </>
     );
 };

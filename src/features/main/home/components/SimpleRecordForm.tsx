@@ -1,5 +1,5 @@
 import { upsertSimpleRecord } from '@/features/main/home/api/recordsApi';
-import { eventIconMap } from '@/features/main/home/composables/icons';
+import { eventIconMap } from '@/features/main/home/lib/icons';
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import AddPhotoIcon from '@/shared/assets/icons/addPhotoIcon.svg?react';
 import { useAuthStore } from '@/shared/store/authStore';

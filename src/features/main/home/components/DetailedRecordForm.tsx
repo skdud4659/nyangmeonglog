@@ -1,6 +1,6 @@
 import { getPetById, updatePet } from '@/features/main/home/api/petsApi';
 import { upsertSimpleRecord } from '@/features/main/home/api/recordsApi';
-import { eventIconMap } from '@/features/main/home/composables/icons';
+import { eventIconMap } from '@/features/main/home/lib/icons';
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import AddPhotoIcon from '@/shared/assets/icons/addPhotoIcon.svg?react';
 import ClearIcon from '@/shared/assets/icons/clearIcon.svg?react';
@@ -46,6 +46,15 @@ const DetailedRecordForm = ({
         { key: 'extra', label: '미용', Icon: eventIconMap.grooming },
         { key: 'health', label: '건강', Icon: eventIconMap.checkup },
     ];
+
+    const FeedIcon = eventIconMap.feed;
+    const SnackIcon = eventIconMap.snack;
+    const WaterIcon = eventIconMap.water;
+    const PoopIcon = eventIconMap.poop;
+    const PeeIcon = eventIconMap.pee;
+    const CheckupIcon = eventIconMap.checkup;
+    const MedicineIcon = eventIconMap.medicine;
+    const GroomingIcon = eventIconMap.grooming;
 
     // 간단 레코드 모델을 그대로 사용하되 입력을 탭별로 쪼갠다
     const [food] = useState<boolean>(initialRecord?.food ?? false);
@@ -243,7 +252,7 @@ const DetailedRecordForm = ({
                     <section className="space-y-8">
                         <div>
                             <div className="flex items-center gap-2 mb-3">
-                                <eventIconMap.feed className="w-5 h-5 text-red-400" />
+                                <FeedIcon className="w-5 h-5 text-red-400" />
                                 <h3 className="text-base font-semibold">사료</h3>
                             </div>
                             <div className="space-y-4">
@@ -309,7 +318,7 @@ const DetailedRecordForm = ({
 
                         <div className="pt-2 border-t">
                             <div className="flex items-center gap-2 mb-3">
-                                <eventIconMap.snack className="w-5 h-5 text-red-400" />
+                                <SnackIcon className="w-5 h-5 text-red-400" />
                                 <h3 className="text-base font-semibold">간식</h3>
                             </div>
                             <div className="flex items-center justify-between">
@@ -337,7 +346,7 @@ const DetailedRecordForm = ({
                 {tab === 'water' && (
                     <section className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <eventIconMap.water className="w-5 h-5 text-blue-400" />
+                            <WaterIcon className="w-5 h-5 text-blue-400" />
                             <h3 className="text-base font-semibold">물</h3>
                         </div>
                         <div className="flex items-center justify-between">
@@ -358,7 +367,7 @@ const DetailedRecordForm = ({
                 {tab === 'poop' && (
                     <section className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <eventIconMap.poop className="w-5 h-5 text-amber-500" />
+                            <PoopIcon className="w-5 h-5 text-amber-500" />
                             <h3 className="text-base font-semibold">대변</h3>
                         </div>
                         <div className="flex items-center justify-between">
@@ -423,7 +432,7 @@ const DetailedRecordForm = ({
                 {tab === 'pee' && (
                     <section className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <eventIconMap.pee className="w-5 h-5 text-yellow-400" />
+                            <PeeIcon className="w-5 h-5 text-yellow-400" />
                             <h3 className="text-base font-semibold">소변</h3>
                         </div>
                         <div className="flex items-center justify-between">
@@ -505,7 +514,7 @@ const DetailedRecordForm = ({
                 {tab === 'health' && (
                     <section className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <eventIconMap.checkup className="w-5 h-5 text-green-500" />
+                            <CheckupIcon className="w-5 h-5 text-green-500" />
                             <h3 className="text-base font-semibold">건강</h3>
                         </div>
 
@@ -559,7 +568,7 @@ const DetailedRecordForm = ({
                         {/* 영양제 */}
                         <div>
                             <div className="mb-3 font-medium flex items-center gap-2">
-                                <eventIconMap.medicine className="w-4 h-4 text-red-400" />
+                                <MedicineIcon className="w-4 h-4 text-red-400" />
                                 <span>영양제</span>
                             </div>
                             <div className="flex gap-2 mb-3">
@@ -624,7 +633,7 @@ const DetailedRecordForm = ({
                 {tab === 'extra' && (
                     <section className="space-y-6">
                         <div className="flex items-center gap-2">
-                            <eventIconMap.grooming className="w-5 h-5 text-purple-500" />
+                            <GroomingIcon className="w-5 h-5 text-purple-500" />
                             <h3 className="text-base font-semibold">미용</h3>
                         </div>
                         {[

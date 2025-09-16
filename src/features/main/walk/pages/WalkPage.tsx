@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createWalk, type WalkPathPoint } from '@/features/main/walk/api/walksApi';
-import { useAuthStore } from '@/shared/store/authStore';
+
+import ConfirmModal from '@/features/main/walk/components/ConfirmModal';
+import SaveWalkButton from '@/features/main/walk/components/SaveWalkButton';
 import { usePetStore } from '@/shared/store/petStore';
 import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,8 +14,6 @@ declare global {
 }
 
 type LatLng = { lat: number; lng: number };
-
-// BodyPortal는 제거(모달을 root 내부에서 렌더)
 
 const formatDuration = (seconds: number) => {
     const mm = Math.floor(seconds / 60)
@@ -300,47 +299,14 @@ const WalkPage = () => {
                 </div>
             </div>
 
-            {/* Confirm modal */}
-            <AnimatePresence>
-                {showConfirm && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-[1000] flex items-center justify-center"
-                    >
-                        <div
-                            className="absolute inset-0 bg-black opacity-50"
-                            onClick={() => setShowConfirm(false)}
-                        />
-                        <motion.div
-                            initial={{ scale: 0.95, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.95, opacity: 0 }}
-                            className="relative z-[1001] bg-white rounded-2xl p-5 w-80"
-                        >
-                            <div className="text-center mb-4">정말로 산책을 끝내시겠어요?</div>
-                            <div className="flex gap-2">
-                                <button
-                                    className="flex-1 h-11 rounded-full border"
-                                    onClick={() => setShowConfirm(false)}
-                                >
-                                    더 할게요!
-                                </button>
-                                <button
-                                    className="flex-1 h-11 rounded-full bg-red-400 text-white"
-                                    onClick={() => {
-                                        setShowConfirm(false);
-                                        stopWalk();
-                                    }}
-                                >
-                                    산책 끝!
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <ConfirmModal
+                open={showConfirm}
+                onCancel={() => setShowConfirm(false)}
+                onConfirm={() => {
+                    setShowConfirm(false);
+                    stopWalk();
+                }}
+            />
 
             {/* Summary panel */}
             <AnimatePresence>
@@ -384,52 +350,6 @@ const WalkPage = () => {
                 )}
             </AnimatePresence>
         </div>
-    );
-};
-
-const SaveWalkButton = ({
-    petId,
-    path,
-    distance,
-    duration,
-    onClose,
-}: {
-    petId: string;
-    path: LatLng[];
-    distance: number;
-    duration: number;
-    onClose: () => void;
-}) => {
-    const user = useAuthStore(s => s.user);
-    const [isSaving, setIsSaving] = useState(false);
-    const handleSave = async () => {
-        if (!user?.id || !petId) return onClose();
-        setIsSaving(true);
-        try {
-            const now = new Date();
-            const startedAt = new Date(now.getTime() - duration * 1000);
-            await createWalk({
-                userId: user.id,
-                petId,
-                startedAt: startedAt.toISOString().slice(0, 19),
-                endedAt: now.toISOString().slice(0, 19),
-                durationSec: duration,
-                distanceM: Number(distance.toFixed(1)),
-                path: path as WalkPathPoint[],
-            });
-            onClose();
-        } finally {
-            setIsSaving(false);
-        }
-    };
-    return (
-        <button
-            className={`flex-1 h-12 rounded-full text-white ${isSaving ? 'bg-gray-300' : 'bg-primary'}`}
-            onClick={handleSave}
-            disabled={isSaving}
-        >
-            {isSaving ? '저장 중...' : '저장'}
-        </button>
     );
 };
 

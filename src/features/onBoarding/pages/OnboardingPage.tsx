@@ -11,7 +11,6 @@ import { useModeSelection } from '@/features/onBoarding/hooks/useModeSelection';
 import { useOwnerInfo } from '@/features/onBoarding/hooks/useOwnerInfo';
 import { usePetCount } from '@/features/onBoarding/hooks/usePetCount';
 import { usePetDetails } from '@/features/onBoarding/hooks/usePetDetails';
-import type { PetInfoData } from '@/features/onBoarding/schemas/petInfoSchema';
 
 import { finalizeOnboarding, insertPet } from '@/features/onBoarding/api/onboardingApi';
 import { ROUTE_PATH } from '@/routes/constant';
@@ -43,34 +42,7 @@ const OnboardingPage = () => {
     }, [currentStep, navigate]);
 
     useEffect(() => {
-        const newPets: PetInfoData[] = [];
-        for (let i = 0; i < petCount.dogs; i++) {
-            // 데이터 임시 입력
-            newPets.push({
-                id: `dog-${i}`,
-                name: '솜이',
-                gender: 'male',
-                birthDate: '2020-01-01',
-                adoptionDate: '2020-01-01',
-                breed: '포메라니안',
-                weight: '5',
-                isNeutered: null,
-            });
-        }
-        for (let i = 0; i < petCount.cats; i++) {
-            // 데이터 임시 입력
-            newPets.push({
-                id: `cat-${i}`,
-                name: '김갈이',
-                gender: 'female',
-                birthDate: '2020-01-01',
-                adoptionDate: '2020-01-01',
-                breed: '스노우슈',
-                weight: '5',
-                isNeutered: true,
-            });
-        }
-        setPets(newPets);
+        setPets([]);
         setCurrentPetIndex(0);
     }, [petCount, setPets]);
 

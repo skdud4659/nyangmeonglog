@@ -1,6 +1,6 @@
 import { supabase } from '@/shared/lib/supabase';
 
-function urlBase64ToUint8Array(base64String: string) {
+const urlBase64ToUint8Array = (base64String: string) => {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
@@ -9,9 +9,9 @@ function urlBase64ToUint8Array(base64String: string) {
         outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
-}
+};
 
-export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
     if (!('serviceWorker' in navigator)) return null;
     try {
         const reg = await navigator.serviceWorker.register('/sw.js');
@@ -20,9 +20,9 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
         console.warn('ServiceWorker register failed', e);
         return null;
     }
-}
+};
 
-export async function initPushForUser(userId: string): Promise<void> {
+export const initPushForUser = async (userId: string): Promise<void> => {
     const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
     if (!vapidPublicKey) {
         console.warn('Missing VITE_VAPID_PUBLIC_KEY');
@@ -52,4 +52,4 @@ export async function initPushForUser(userId: string): Promise<void> {
     await supabase
         .from('push_subscriptions')
         .upsert({ user_id: userId, endpoint, p256dh, auth }, { onConflict: 'endpoint' });
-}
+};

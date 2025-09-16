@@ -1,6 +1,7 @@
-import { eventIconMap } from '@/features/main/home/composables/icons';
+import { eventIconMap } from '@/features/main/home/lib/icons';
 import type { EventItem } from '@/features/main/home/types/event';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 interface CalendarGridProps {
     currentMonth: number;
@@ -19,19 +20,17 @@ export const CalendarGrid = ({
 }: CalendarGridProps) => {
     const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-    const getDaysInMonth = () => {
+    const daysInView = useMemo(() => {
         const days: { day: number; isCurrentMonth: boolean; isToday: boolean }[] = [];
         const today = new Date();
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
 
-        // 이전 달 채우기
         const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
         for (let i = firstDay.getDay() - 1; i >= 0; i--) {
             days.push({ day: prevLastDay - i, isCurrentMonth: false, isToday: false });
         }
 
-        // 이번 달
         for (let i = 1; i <= lastDay.getDate(); i++) {
             days.push({
                 day: i,
@@ -43,21 +42,22 @@ export const CalendarGrid = ({
             });
         }
 
-        // 다음 달 채우기
         const remaining = 42 - days.length;
         for (let i = 1; i <= remaining; i++) {
             days.push({ day: i, isCurrentMonth: false, isToday: false });
         }
 
         return days;
-    };
+    }, [currentYear, currentMonth]);
 
-    const getEventsForDate = (day: number) => {
-        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(
-            day
-        ).padStart(2, '0')}`;
-        return events.filter(event => event.date === dateStr);
-    };
+    const dateToEventsMap = useMemo(() => {
+        const map = new Map<string, EventItem[]>();
+        for (const ev of events) {
+            if (!map.has(ev.date)) map.set(ev.date, []);
+            map.get(ev.date)!.push(ev);
+        }
+        return map;
+    }, [events]);
 
     return (
         <div className="px-6 py-4 flex-1 flex flex-col">
@@ -81,7 +81,7 @@ export const CalendarGrid = ({
 
             {/* 날짜 grid */}
             <div className="grid grid-cols-7 gap-1 flex-1">
-                {getDaysInMonth().map((dayInfo, idx) => {
+                {daysInView.map((dayInfo, idx) => {
                     const dayOfWeek = dayInfo.isCurrentMonth
                         ? new Date(currentYear, currentMonth, dayInfo.day).getDay()
                         : -1;
@@ -97,7 +97,10 @@ export const CalendarGrid = ({
                     const cellDate = new Date(currentYear, currentMonth, dayInfo.day);
                     const isFuture =
                         dayInfo.isCurrentMonth && cellDate.getTime() > todayMid.getTime();
-                    const dayEvents = dayInfo.isCurrentMonth ? getEventsForDate(dayInfo.day) : [];
+                    const dayKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayInfo.day).padStart(2, '0')}`;
+                    const dayEvents = dayInfo.isCurrentMonth
+                        ? (dateToEventsMap.get(dayKey) ?? [])
+                        : [];
                     const isSelected = selectedDate === dayInfo.day && dayInfo.isCurrentMonth;
 
                     const isInteractive = dayInfo.isCurrentMonth && !isFuture;

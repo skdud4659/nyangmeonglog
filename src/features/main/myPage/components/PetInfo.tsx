@@ -27,16 +27,16 @@ const PetInfo = ({ pet }: { pet?: PetItem }) => {
 
 export default PetInfo;
 
-function formatDate(isoDate: string): string {
+const formatDate = (isoDate: string): string => {
     const d = new Date(isoDate);
     if (isNaN(d.getTime())) return isoDate;
     const y = d.getFullYear();
     const m = `${d.getMonth() + 1}`.padStart(2, '0');
     const day = `${d.getDate()}`.padStart(2, '0');
     return `${y}-${m}-${day}`;
-}
+};
 
-function calcAgeYears(isoDate: string): number {
+const calcAgeYears = (isoDate: string): number => {
     const birth = new Date(isoDate);
     if (isNaN(birth.getTime())) return 0;
     const today = new Date();
@@ -46,4 +46,4 @@ function calcAgeYears(isoDate: string): number {
         (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate());
     if (hasNotHadBirthdayThisYear) years -= 1;
     return Math.max(0, years);
-}
+};
