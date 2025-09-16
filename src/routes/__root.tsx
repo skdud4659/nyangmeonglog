@@ -1,6 +1,8 @@
 import MainContainer from '@/features/main/MainContainer';
 import { ROUTE_PATH } from '@/routes/constant';
+import { getActivePetId as dbGetActive } from '@/shared/lib/profileApi';
 import { supabase } from '@/shared/lib/supabase';
+import { usePetStore } from '@/shared/store/petStore';
 import { createRootRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router';
 
 const RootComponent = () => {
@@ -69,6 +71,17 @@ export const Route = createRootRoute({
 
             if (!hasProfileName && !hasAnyPet) {
                 throw redirect({ to: ROUTE_PATH.ONBOARDING.ROOT });
+            }
+
+            // 전역 activePetId 보정: 라우트 진입 시 DB에서 한 번 동기화
+            if (typeof window !== 'undefined') {
+                // 전역 스토어에 펫 목록 선 로드 (워크 페이지에서 직접 로드하지 않아도 안전)
+                const store = usePetStore.getState();
+                await store.loadPetsForCurrentUser();
+                const activePetId = await dbGetActive();
+                if (activePetId) {
+                    store.setActivePetId(activePetId);
+                }
             }
         }
     },

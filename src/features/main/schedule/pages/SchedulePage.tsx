@@ -9,12 +9,15 @@ import {
 } from '@/features/main/schedule/api/schedulesApi';
 import AddScheduleModal from '@/features/main/schedule/components/AddScheduleModal';
 import EditScheduleModal from '@/features/main/schedule/components/EditScheduleModal';
+import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
 import DentalBgIcon from '@/shared/assets/icons/dentalIcon.svg?react';
+import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import InjectionBgIcon from '@/shared/assets/icons/injectionIcon.svg?react';
 import PawPrintIcon from '@/shared/assets/icons/pawPrintIcon.svg?react';
 import Button from '@/shared/components/atoms/Button';
 import IconButton from '@/shared/components/atoms/IconButton';
 import { useAuthStore } from '@/shared/store/authStore';
+import { usePetStore } from '@/shared/store/petStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, MoreVertical } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -50,10 +53,16 @@ const SectionHeader = ({ title }: { title: string }) => (
 
 const ScheduleRow = ({
     item,
+    petName,
+    petPhotoUrl,
+    petSpecies,
     onEdit,
     onDelete,
 }: {
     item: ScheduleItem;
+    petName?: string;
+    petPhotoUrl?: string | null;
+    petSpecies?: 'dog' | 'cat';
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
 }) => {
@@ -84,6 +93,22 @@ const ScheduleRow = ({
                 <div className="flex flex-col">
                     <span className="text-label text-gray_5">{formatDateKorean(item.date)}</span>
                     <span className="text-body2-bold text-gray_9">{item.title}</span>
+                    {petName && (
+                        <span className="text-xs text-gray_5 flex items-center gap-1 mt-0.5">
+                            {petPhotoUrl ? (
+                                <img
+                                    src={petPhotoUrl}
+                                    alt={petName}
+                                    className="w-4 h-4 rounded-full object-cover border border-gray-200"
+                                />
+                            ) : petSpecies === 'dog' ? (
+                                <DogIcon className="w-4 h-4 text-gray_5" />
+                            ) : (
+                                <CatIcon className="w-4 h-4 text-gray_5" />
+                            )}
+                            <span>{petName}</span>
+                        </span>
+                    )}
                 </div>
             </div>
             <div ref={menuRef}>
@@ -155,11 +180,13 @@ const CategoryTabs = ({
 
 const HeroCard = ({
     item,
+    petName,
     category,
     onChangeClick,
     onCompleteClick,
 }: {
     item: ScheduleItem;
+    petName?: string;
     category: ScheduleCategory;
     onChangeClick: () => void;
     onCompleteClick: () => void;
@@ -181,7 +208,7 @@ const HeroCard = ({
                     </span>
                     <div className="mt-3">
                         <p className="text-body1-bold text-gray_9">
-                            {item.title}까지
+                            {petName ? `${petName} - ${item.title}` : item.title}까지
                             <br />
                             <span className="text-[#3A6FF8]">{dday.replace('D-', '')}일 </span>
                             <span>남았어요</span>
@@ -216,6 +243,7 @@ const SchedulePage = () => {
     const [showAllUpcoming, setShowAllUpcoming] = useState(false);
     const [showAllCompleted, setShowAllCompleted] = useState(false);
     const user = useAuthStore(state => state.user);
+    const { pets, activePetId } = usePetStore();
     const [openAdd, setOpenAdd] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -287,6 +315,7 @@ const SchedulePage = () => {
                     </div>
                     <HeroCard
                         item={heroItem}
+                        petName={pets.find(p => p.id === heroItem.petId)?.name}
                         category={category}
                         onChangeClick={() => {
                             setEditingId(heroItem.id);
@@ -323,17 +352,23 @@ const SchedulePage = () => {
                     <SectionHeader title="다가올 일정" />
                     <div className="px-6 flex flex-col gap-[6px]">
                         {(showAllUpcoming ? upcomingItems.slice(1) : upcomingItems.slice(1, 4)).map(
-                            item => (
-                                <ScheduleRow
-                                    key={item.id}
-                                    item={item}
-                                    onEdit={id => {
-                                        setEditingId(id);
-                                        setOpenEdit(true);
-                                    }}
-                                    onDelete={handleDelete}
-                                />
-                            )
+                            item => {
+                                const pet = pets.find(p => p.id === item.petId);
+                                return (
+                                    <ScheduleRow
+                                        key={item.id}
+                                        item={item}
+                                        petName={pet?.name}
+                                        petPhotoUrl={pet?.photoUrl ?? null}
+                                        petSpecies={pet?.species}
+                                        onEdit={id => {
+                                            setEditingId(id);
+                                            setOpenEdit(true);
+                                        }}
+                                        onDelete={handleDelete}
+                                    />
+                                );
+                            }
                         )}
                         {upcomingItems.length > 4 && (
                             <div className="flex justify-center">
@@ -352,17 +387,23 @@ const SchedulePage = () => {
                     <SectionHeader title="완료한 일정" />
                     <div className="px-6 flex flex-col gap-3">
                         {(showAllCompleted ? completedItems : completedItems.slice(0, 3)).map(
-                            item => (
-                                <ScheduleRow
-                                    key={item.id}
-                                    item={item}
-                                    onEdit={id => {
-                                        setEditingId(id);
-                                        setOpenEdit(true);
-                                    }}
-                                    onDelete={handleDelete}
-                                />
-                            )
+                            item => {
+                                const pet = pets.find(p => p.id === item.petId);
+                                return (
+                                    <ScheduleRow
+                                        key={item.id}
+                                        item={item}
+                                        petName={pet?.name}
+                                        petPhotoUrl={pet?.photoUrl ?? null}
+                                        petSpecies={pet?.species}
+                                        onEdit={id => {
+                                            setEditingId(id);
+                                            setOpenEdit(true);
+                                        }}
+                                        onDelete={handleDelete}
+                                    />
+                                );
+                            }
                         )}
                         {completedItems.length > 3 && (
                             <div className="flex justify-center">
@@ -397,10 +438,13 @@ const SchedulePage = () => {
                 open={openAdd}
                 onClose={() => setOpenAdd(false)}
                 defaultDate={heroItem?.date}
+                petOptions={pets.map(p => ({ id: p.id, name: p.name, photoUrl: p.photoUrl }))}
+                defaultPetId={activePetId}
                 onSubmit={async form => {
                     if (!user?.id) return;
                     const newItem = await createSchedule({
                         userId: user.id,
+                        petId: form.petId ?? null,
                         category,
                         title: form.title || (category === 'health' ? '건강 일정' : '케어 일정'),
                         date: form.date,
@@ -419,6 +463,7 @@ const SchedulePage = () => {
                     setEditingId(null);
                 }}
                 defaultValues={{
+                    petId: editingItem?.petId ?? heroItem?.petId ?? activePetId ?? null,
                     title: editingItem?.title ?? heroItem?.title ?? '',
                     date:
                         editingItem?.date ??
@@ -430,9 +475,11 @@ const SchedulePage = () => {
                     reminderMinutes:
                         editingItem?.reminderMinutes ?? heroItem?.reminderMinutes ?? 60,
                 }}
+                petOptions={pets.map(p => ({ id: p.id, name: p.name, photoUrl: p.photoUrl }))}
                 onSubmit={async form => {
                     if (!editingId) return;
                     const updated = await updateSchedule(editingId, {
+                        petId: form.petId ?? null,
                         title: form.title,
                         date: form.date,
                         location: form.location || undefined,

@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 export type EditScheduleForm = {
+    petId: string | null;
     title: string;
     date: string; // YYYY-MM-DD
     location: string;
@@ -16,13 +17,15 @@ type Props = {
     onClose: () => void;
     onSubmit: (form: EditScheduleForm) => Promise<void> | void;
     defaultValues: EditScheduleForm;
+    petOptions: { id: string; name: string; photoUrl?: string | null }[];
 };
 
 const minuteOptions = [0, 5, 10, 15, 30, 60, 120, 1440];
 
-const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) => {
+const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues, petOptions }: Props) => {
     const todayIso = useMemo(() => new Date().toISOString().split('T')[0], []);
     const [form, setForm] = useState<EditScheduleForm>({
+        petId: defaultValues?.petId ?? petOptions[0]?.id ?? null,
         title: defaultValues?.title ?? '',
         date: defaultValues?.date ?? todayIso,
         location: defaultValues?.location ?? '',
@@ -33,6 +36,7 @@ const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) =>
     useEffect(() => {
         if (open) {
             setForm({
+                petId: defaultValues?.petId ?? petOptions[0]?.id ?? null,
                 title: defaultValues?.title ?? '',
                 date: defaultValues?.date ?? todayIso,
                 location: defaultValues?.location ?? '',
@@ -40,7 +44,7 @@ const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) =>
                 reminderMinutes: defaultValues?.reminderMinutes ?? 60,
             });
         }
-    }, [open, defaultValues, todayIso]);
+    }, [open, defaultValues, todayIso, petOptions]);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -52,8 +56,8 @@ const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) =>
         try {
             await onSubmit(form);
             onClose();
-        } catch (e: any) {
-            const msg = e?.message || '수정 중 오류가 발생했어요';
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : '수정 중 오류가 발생했어요';
             setError(msg);
         } finally {
             setSubmitting(false);
@@ -88,6 +92,26 @@ const EditScheduleModal = ({ open, onClose, onSubmit, defaultValues }: Props) =>
                             </div>
 
                             <div className="space-y-4">
+                                {/* 반려동물 선택 */}
+                                <div className="flex flex-col">
+                                    <label className="text-label text-gray_6 mb-1">반려동물</label>
+                                    <select
+                                        className="border rounded-xl px-3 py-2 text-body2"
+                                        value={form.petId ?? ''}
+                                        onChange={e =>
+                                            setForm(f => ({ ...f, petId: e.target.value || null }))
+                                        }
+                                    >
+                                        <option value="" disabled>
+                                            선택하세요
+                                        </option>
+                                        {petOptions.map(p => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 {/* 내용 */}
                                 <div className="flex flex-col">
                                     <label className="text-label text-gray_6 mb-1">내용</label>

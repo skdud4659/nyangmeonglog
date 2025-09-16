@@ -12,14 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as R404RouteImport } from './routes/$404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
-import { Route as MainWalkRouteImport } from './routes/main/walk'
 import { Route as MainScheduleRouteImport } from './routes/main/schedule'
 import { Route as MainHomeRouteImport } from './routes/main/home'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as MainWalkIndexRouteImport } from './routes/main/walk/index'
 import { Route as MainMyPageIndexRouteImport } from './routes/main/myPage/index'
+import { Route as MainWalkHistoryRouteImport } from './routes/main/walk/history'
 import { Route as MainMyPagePetFormRouteImport } from './routes/main/myPage/petForm'
 import { Route as MainMyPageModeRouteImport } from './routes/main/myPage/mode'
+import { Route as MainWalkHistoryIdRouteImport } from './routes/main/walk/history_.$id'
 
 const R404Route = R404RouteImport.update({
   id: '/$404',
@@ -34,11 +36,6 @@ const IndexRoute = IndexRouteImport.update({
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: '/onboarding/',
   path: '/onboarding/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MainWalkRoute = MainWalkRouteImport.update({
-  id: '/main/walk',
-  path: '/main/walk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainScheduleRoute = MainScheduleRouteImport.update({
@@ -61,9 +58,19 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MainWalkIndexRoute = MainWalkIndexRouteImport.update({
+  id: '/main/walk/',
+  path: '/main/walk/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainMyPageIndexRoute = MainMyPageIndexRouteImport.update({
   id: '/main/myPage/',
   path: '/main/myPage/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainWalkHistoryRoute = MainWalkHistoryRouteImport.update({
+  id: '/main/walk/history',
+  path: '/main/walk/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainMyPagePetFormRoute = MainMyPagePetFormRouteImport.update({
@@ -76,6 +83,11 @@ const MainMyPageModeRoute = MainMyPageModeRouteImport.update({
   path: '/main/myPage/mode',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MainWalkHistoryIdRoute = MainWalkHistoryIdRouteImport.update({
+  id: '/main/walk/history_/$id',
+  path: '/main/walk/history/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,11 +96,13 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
   '/main/schedule': typeof MainScheduleRoute
-  '/main/walk': typeof MainWalkRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/main/myPage/mode': typeof MainMyPageModeRoute
   '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/walk/history': typeof MainWalkHistoryRoute
   '/main/myPage': typeof MainMyPageIndexRoute
+  '/main/walk': typeof MainWalkIndexRoute
+  '/main/walk/history/$id': typeof MainWalkHistoryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,11 +111,13 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
   '/main/schedule': typeof MainScheduleRoute
-  '/main/walk': typeof MainWalkRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/main/myPage/mode': typeof MainMyPageModeRoute
   '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/walk/history': typeof MainWalkHistoryRoute
   '/main/myPage': typeof MainMyPageIndexRoute
+  '/main/walk': typeof MainWalkIndexRoute
+  '/main/walk/history/$id': typeof MainWalkHistoryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,11 +127,13 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/main/home': typeof MainHomeRoute
   '/main/schedule': typeof MainScheduleRoute
-  '/main/walk': typeof MainWalkRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/main/myPage/mode': typeof MainMyPageModeRoute
   '/main/myPage/petForm': typeof MainMyPagePetFormRoute
+  '/main/walk/history': typeof MainWalkHistoryRoute
   '/main/myPage/': typeof MainMyPageIndexRoute
+  '/main/walk/': typeof MainWalkIndexRoute
+  '/main/walk/history_/$id': typeof MainWalkHistoryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,11 +144,13 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/main/home'
     | '/main/schedule'
-    | '/main/walk'
     | '/onboarding'
     | '/main/myPage/mode'
     | '/main/myPage/petForm'
+    | '/main/walk/history'
     | '/main/myPage'
+    | '/main/walk'
+    | '/main/walk/history/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,11 +159,13 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/main/home'
     | '/main/schedule'
-    | '/main/walk'
     | '/onboarding'
     | '/main/myPage/mode'
     | '/main/myPage/petForm'
+    | '/main/walk/history'
     | '/main/myPage'
+    | '/main/walk'
+    | '/main/walk/history/$id'
   id:
     | '__root__'
     | '/'
@@ -152,11 +174,13 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/main/home'
     | '/main/schedule'
-    | '/main/walk'
     | '/onboarding/'
     | '/main/myPage/mode'
     | '/main/myPage/petForm'
+    | '/main/walk/history'
     | '/main/myPage/'
+    | '/main/walk/'
+    | '/main/walk/history_/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,11 +190,13 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   MainHomeRoute: typeof MainHomeRoute
   MainScheduleRoute: typeof MainScheduleRoute
-  MainWalkRoute: typeof MainWalkRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
   MainMyPageModeRoute: typeof MainMyPageModeRoute
   MainMyPagePetFormRoute: typeof MainMyPagePetFormRoute
+  MainWalkHistoryRoute: typeof MainWalkHistoryRoute
   MainMyPageIndexRoute: typeof MainMyPageIndexRoute
+  MainWalkIndexRoute: typeof MainWalkIndexRoute
+  MainWalkHistoryIdRoute: typeof MainWalkHistoryIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -194,13 +220,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/main/walk': {
-      id: '/main/walk'
-      path: '/main/walk'
-      fullPath: '/main/walk'
-      preLoaderRoute: typeof MainWalkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/main/schedule': {
@@ -231,11 +250,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/main/walk/': {
+      id: '/main/walk/'
+      path: '/main/walk'
+      fullPath: '/main/walk'
+      preLoaderRoute: typeof MainWalkIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/main/myPage/': {
       id: '/main/myPage/'
       path: '/main/myPage'
       fullPath: '/main/myPage'
       preLoaderRoute: typeof MainMyPageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/main/walk/history': {
+      id: '/main/walk/history'
+      path: '/main/walk/history'
+      fullPath: '/main/walk/history'
+      preLoaderRoute: typeof MainWalkHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/main/myPage/petForm': {
@@ -252,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainMyPageModeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/main/walk/history_/$id': {
+      id: '/main/walk/history_/$id'
+      path: '/main/walk/history/$id'
+      fullPath: '/main/walk/history/$id'
+      preLoaderRoute: typeof MainWalkHistoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -262,11 +302,13 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   MainHomeRoute: MainHomeRoute,
   MainScheduleRoute: MainScheduleRoute,
-  MainWalkRoute: MainWalkRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
   MainMyPageModeRoute: MainMyPageModeRoute,
   MainMyPagePetFormRoute: MainMyPagePetFormRoute,
+  MainWalkHistoryRoute: MainWalkHistoryRoute,
   MainMyPageIndexRoute: MainMyPageIndexRoute,
+  MainWalkIndexRoute: MainWalkIndexRoute,
+  MainWalkHistoryIdRoute: MainWalkHistoryIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

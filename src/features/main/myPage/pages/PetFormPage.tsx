@@ -83,9 +83,9 @@ const PetFormPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <TopNavigation onBack={() => navigate({ to: '/main/myPage' })} />
-            <main className="flex flex-col flex-1 pt-14 px-6 gap-8">
+            <main className="flex flex-col flex-1 pt-14 px-6 pb-3 gap-8">
                 <div className="flex items-center gap-2">
                     <button
                         className={`px-3 py-1 rounded-full text-sm border ${

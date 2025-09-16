@@ -32,6 +32,16 @@ const OnboardingPage = () => {
     const { pets, setPets, updatePet, validate: validatePet } = usePetDetails();
     const { modeSettings, setModeSettings, validate: validateMode } = useModeSelection();
 
+    // 마지막 단계에 도달하면 잠시 후 로그인 화면으로 이동
+    useEffect(() => {
+        if (currentStep === TOTAL_STEPS - 1) {
+            const timerId = window.setTimeout(() => {
+                navigate({ to: ROUTE_PATH.MAIN.HOME });
+            }, 1500);
+            return () => window.clearTimeout(timerId);
+        }
+    }, [currentStep, navigate]);
+
     useEffect(() => {
         const newPets: PetInfoData[] = [];
         for (let i = 0; i < petCount.dogs; i++) {
@@ -151,7 +161,7 @@ const OnboardingPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <TopNavigation onBack={handleBack}>
                 <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} />
             </TopNavigation>

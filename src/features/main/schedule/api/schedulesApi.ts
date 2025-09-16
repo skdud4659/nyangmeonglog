@@ -5,6 +5,7 @@ export type ScheduleCategory = 'health' | 'care';
 export type DbScheduleRow = {
     id: string;
     user_id: string;
+    pet_id?: string | null;
     category: ScheduleCategory;
     title: string;
     date: string; // YYYY-MM-DD
@@ -17,6 +18,7 @@ export type DbScheduleRow = {
 
 export type ScheduleItem = {
     id: string;
+    petId: string | null;
     category: ScheduleCategory;
     title: string;
     date: string;
@@ -28,6 +30,7 @@ export type ScheduleItem = {
 
 const mapRowToItem = (row: DbScheduleRow): ScheduleItem => ({
     id: row.id,
+    petId: row.pet_id ?? null,
     category: row.category,
     title: row.title,
     date: row.date,
@@ -40,19 +43,24 @@ const mapRowToItem = (row: DbScheduleRow): ScheduleItem => ({
 export async function listSchedules(params: {
     userId: string;
     category?: ScheduleCategory;
+    petId?: string | null;
 }): Promise<ScheduleItem[]> {
     const { userId, category } = params;
 
     let query = supabase
         .from('schedules')
         .select(
-            'id, user_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
+            'id, user_id, pet_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
         )
         .eq('user_id', userId)
         .order('date', { ascending: true });
 
     if (category) {
         query = query.eq('category', category);
+    }
+
+    if (typeof params.petId !== 'undefined' && params.petId !== null) {
+        query = query.eq('pet_id', params.petId);
     }
 
     const { data, error } = await query;
@@ -70,6 +78,7 @@ export async function markScheduleCompleted(id: string, completed: boolean): Pro
 
 export async function createSchedule(input: {
     userId: string;
+    petId: string | null;
     category: ScheduleCategory;
     title: string;
     date: string; // YYYY-MM-DD
@@ -79,6 +88,7 @@ export async function createSchedule(input: {
 }): Promise<ScheduleItem> {
     const payload = {
         user_id: input.userId,
+        pet_id: input.petId ?? null,
         category: input.category,
         title: input.title,
         date: input.date,
@@ -91,7 +101,7 @@ export async function createSchedule(input: {
         .from('schedules')
         .insert(payload)
         .select(
-            'id, user_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
+            'id, user_id, pet_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
         )
         .single();
     if (error) throw error;
@@ -102,6 +112,7 @@ export async function updateSchedule(
     id: string,
     input: {
         title?: string;
+        petId?: string | null;
         category?: ScheduleCategory;
         date?: string; // YYYY-MM-DD
         location?: string;
@@ -112,6 +123,7 @@ export async function updateSchedule(
 ): Promise<ScheduleItem> {
     const payload: Partial<DbScheduleRow> = {};
     if (typeof input.title !== 'undefined') payload.title = input.title;
+    if (typeof input.petId !== 'undefined') (payload as any).pet_id = input.petId;
     if (typeof input.category !== 'undefined') payload.category = input.category;
     if (typeof input.date !== 'undefined') payload.date = input.date;
     if (typeof input.location !== 'undefined') payload.location = input.location ?? null;
@@ -126,7 +138,7 @@ export async function updateSchedule(
         .update(payload)
         .eq('id', id)
         .select(
-            'id, user_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
+            'id, user_id, pet_id, category, title, date, location, is_completed, notifications_enabled, reminder_minutes, created_at'
         )
         .single();
     if (error) throw error;

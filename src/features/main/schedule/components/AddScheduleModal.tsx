@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 export type AddScheduleForm = {
+    petId: string | null;
     title: string;
     date: string; // YYYY-MM-DD
     location: string;
@@ -16,13 +17,23 @@ type Props = {
     onClose: () => void;
     onSubmit: (form: AddScheduleForm) => Promise<void> | void;
     defaultDate?: string; // prefill
+    petOptions: { id: string; name: string; photoUrl?: string | null }[];
+    defaultPetId?: string | null;
 };
 
 const minuteOptions = [0, 5, 10, 15, 30, 60, 120, 1440];
 
-const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
+const AddScheduleModal = ({
+    open,
+    onClose,
+    onSubmit,
+    defaultDate,
+    petOptions,
+    defaultPetId,
+}: Props) => {
     const todayIso = useMemo(() => new Date().toISOString().split('T')[0], []);
     const [form, setForm] = useState<AddScheduleForm>({
+        petId: defaultPetId ?? petOptions[0]?.id ?? null,
         title: '',
         date: defaultDate ?? todayIso,
         location: '',
@@ -33,6 +44,7 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
     useEffect(() => {
         if (open) {
             setForm({
+                petId: defaultPetId ?? petOptions[0]?.id ?? null,
                 title: '',
                 date: defaultDate ?? todayIso,
                 location: '',
@@ -40,7 +52,7 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
                 reminderMinutes: 60,
             });
         }
-    }, [open, defaultDate, todayIso]);
+    }, [open, defaultDate, todayIso, defaultPetId, petOptions]);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -50,10 +62,13 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
         setSubmitting(true);
         setError(null);
         try {
+            if (!form.petId) {
+                throw new Error('반려동물을 선택해주세요');
+            }
             await onSubmit(form);
             onClose();
-        } catch (e: any) {
-            const msg = e?.message || '등록 중 오류가 발생했어요';
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : '등록 중 오류가 발생했어요';
             setError(msg);
         } finally {
             setSubmitting(false);
@@ -88,6 +103,26 @@ const AddScheduleModal = ({ open, onClose, onSubmit, defaultDate }: Props) => {
                             </div>
 
                             <div className="space-y-4">
+                                {/* 반려동물 선택 */}
+                                <div className="flex flex-col">
+                                    <label className="text-label text-gray_6 mb-1">반려동물</label>
+                                    <select
+                                        className="border rounded-xl px-3 py-2 text-body2"
+                                        value={form.petId ?? ''}
+                                        onChange={e =>
+                                            setForm(f => ({ ...f, petId: e.target.value || null }))
+                                        }
+                                    >
+                                        <option value="" disabled>
+                                            선택하세요
+                                        </option>
+                                        {petOptions.map(p => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 {/* 내용 */}
                                 <div className="flex flex-col">
                                     <label className="text-label text-gray_6 mb-1">내용</label>

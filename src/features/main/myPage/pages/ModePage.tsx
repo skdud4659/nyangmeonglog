@@ -22,7 +22,7 @@ const ModePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <TopNavigation onBack={() => navigate({ to: '/main/myPage' })} />
             <main className="flex flex-col flex-1 pt-12 px-6 gap-3">
                 <StepModeSelection modeSettings={modeSettings} setModeSettings={setModeSettings} />

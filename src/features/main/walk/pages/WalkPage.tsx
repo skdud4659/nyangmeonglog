@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { createWalk, type WalkPathPoint } from '@/features/main/walk/api/walksApi';
+import { useAuthStore } from '@/shared/store/authStore';
 import { usePetStore } from '@/shared/store/petStore';
+import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 declare global {
     interface Window {
@@ -12,11 +14,7 @@ declare global {
 
 type LatLng = { lat: number; lng: number };
 
-const BodyPortal = ({ children }: { children: ReactNode }) => {
-    if (typeof document === 'undefined') return null;
-    const root = document.getElementById('root') ?? document.body;
-    return createPortal(children, root);
-};
+// BodyPortal는 제거(모달을 root 내부에서 렌더)
 
 const formatDuration = (seconds: number) => {
     const mm = Math.floor(seconds / 60)
@@ -88,12 +86,13 @@ const WalkPage = () => {
 
     const [isReady, setIsReady] = useState(false);
     const [isWalking, setIsWalking] = useState(false);
-    const [, setPath] = useState<LatLng[]>([]);
+    const [path, setPath] = useState<LatLng[]>([]);
     const [distance, setDistance] = useState(0);
     const [duration, setDuration] = useState(0);
     const [showConfirm, setShowConfirm] = useState(false);
     const [showSummary, setShowSummary] = useState(false);
     const [mapError, setMapError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     // 활성 펫 정보 (마커 이미지에 사용)
     const pets = usePetStore(state => state.pets);
@@ -151,7 +150,7 @@ const WalkPage = () => {
                     endArrow: true,
                 });
                 // 커스텀 사진 마커
-                const contentEl = buildPhotoMarkerElement(activePet?.photo_url ?? undefined);
+                const contentEl = buildPhotoMarkerElement(activePet?.photoUrl ?? undefined);
                 photoMarkerRef.current = new window.kakao.maps.CustomOverlay({
                     position: center,
                     content: contentEl,
@@ -242,9 +241,9 @@ const WalkPage = () => {
     // 활성 펫 사진 변경 시 마커 업데이트
     useEffect(() => {
         if (!mapRef.current || !photoMarkerRef.current) return;
-        const el = buildPhotoMarkerElement(activePet?.photo_url ?? undefined);
+        const el = buildPhotoMarkerElement(activePet?.photoUrl ?? undefined);
         photoMarkerRef.current.setContent(el);
-    }, [activePet?.photo_url]);
+    }, [activePet?.photoUrl]);
 
     return (
         <div className="relative h-full w-full">
@@ -267,6 +266,14 @@ const WalkPage = () => {
                     className="px-6 pt-5 pb-6 bg-white rounded-t-2xl border-t"
                     style={{ boxShadow: '0px -1px 19px 0px rgba(202, 202, 202, 0.25)' }}
                 >
+                    <div className="flex justify-end mb-4">
+                        <button
+                            className="text-sm text-primary"
+                            onClick={() => navigate({ to: '/main/walk/history' })}
+                        >
+                            기록 보기
+                        </button>
+                    </div>
                     <div className="flex items-center justify-around mb-4">
                         <div className="text-center">
                             <div className="text-sm text-gray-500">산책시간</div>
@@ -296,42 +303,42 @@ const WalkPage = () => {
             {/* Confirm modal */}
             <AnimatePresence>
                 {showConfirm && (
-                    <BodyPortal>
-                        <>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 0.5 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black z-[1000]"
-                                onClick={() => setShowConfirm(false)}
-                            />
-                            <motion.div
-                                initial={{ scale: 0.95, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.95, opacity: 0 }}
-                                className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[1001] bg-white rounded-2xl p-5 w-80"
-                            >
-                                <div className="text-center mb-4">정말로 산책을 끝내시겠어요?</div>
-                                <div className="flex gap-2">
-                                    <button
-                                        className="flex-1 h-11 rounded-full border"
-                                        onClick={() => setShowConfirm(false)}
-                                    >
-                                        더 할게요!
-                                    </button>
-                                    <button
-                                        className="flex-1 h-11 rounded-full bg-red-400 text-white"
-                                        onClick={() => {
-                                            setShowConfirm(false);
-                                            stopWalk();
-                                        }}
-                                    >
-                                        산책 끝!
-                                    </button>
-                                </div>
-                            </motion.div>
-                        </>
-                    </BodyPortal>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-[1000] flex items-center justify-center"
+                    >
+                        <div
+                            className="absolute inset-0 bg-black opacity-50"
+                            onClick={() => setShowConfirm(false)}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="relative z-[1001] bg-white rounded-2xl p-5 w-80"
+                        >
+                            <div className="text-center mb-4">정말로 산책을 끝내시겠어요?</div>
+                            <div className="flex gap-2">
+                                <button
+                                    className="flex-1 h-11 rounded-full border"
+                                    onClick={() => setShowConfirm(false)}
+                                >
+                                    더 할게요!
+                                </button>
+                                <button
+                                    className="flex-1 h-11 rounded-full bg-red-400 text-white"
+                                    onClick={() => {
+                                        setShowConfirm(false);
+                                        stopWalk();
+                                    }}
+                                >
+                                    산책 끝!
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
@@ -365,17 +372,64 @@ const WalkPage = () => {
                             <button className="flex-1 h-12 rounded-full border" onClick={startWalk}>
                                 다시 걷기
                             </button>
-                            <button
-                                className="flex-1 h-12 rounded-full bg-primary text-white"
-                                onClick={() => setShowSummary(false)}
-                            >
-                                닫기
-                            </button>
+                            <SaveWalkButton
+                                petId={activePetId ?? ''}
+                                path={path}
+                                distance={distance}
+                                duration={duration}
+                                onClose={() => setShowSummary(false)}
+                            />
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
         </div>
+    );
+};
+
+const SaveWalkButton = ({
+    petId,
+    path,
+    distance,
+    duration,
+    onClose,
+}: {
+    petId: string;
+    path: LatLng[];
+    distance: number;
+    duration: number;
+    onClose: () => void;
+}) => {
+    const user = useAuthStore(s => s.user);
+    const [isSaving, setIsSaving] = useState(false);
+    const handleSave = async () => {
+        if (!user?.id || !petId) return onClose();
+        setIsSaving(true);
+        try {
+            const now = new Date();
+            const startedAt = new Date(now.getTime() - duration * 1000);
+            await createWalk({
+                userId: user.id,
+                petId,
+                startedAt: startedAt.toISOString().slice(0, 19),
+                endedAt: now.toISOString().slice(0, 19),
+                durationSec: duration,
+                distanceM: Number(distance.toFixed(1)),
+                path: path as WalkPathPoint[],
+            });
+            onClose();
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    return (
+        <button
+            className={`flex-1 h-12 rounded-full text-white ${isSaving ? 'bg-gray-300' : 'bg-primary'}`}
+            onClick={handleSave}
+            disabled={isSaving}
+        >
+            {isSaving ? '저장 중...' : '저장'}
+        </button>
     );
 };
 

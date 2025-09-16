@@ -1,4 +1,6 @@
 import type { PetItem } from '@/features/main/home/api/petsApi';
+import CatIcon from '@/shared/assets/icons/catIcon.svg?react';
+import DogIcon from '@/shared/assets/icons/dogIcon.svg?react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 
@@ -34,7 +36,13 @@ const PetProfile = ({ pets, activePet, onSelectPet, onAddPet }: PetProfileProps)
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <span className="text-xs text-gray-500">{c.name.slice(0, 2)}</span>
+                            <span className="text-gray-500">
+                                {c.species === 'dog' ? (
+                                    <DogIcon className="w-6 h-6" />
+                                ) : (
+                                    <CatIcon className="w-6 h-6" />
+                                )}
+                            </span>
                         )}
                     </button>
                 ))}
@@ -64,7 +72,11 @@ const PetProfile = ({ pets, activePet, onSelectPet, onAddPet }: PetProfileProps)
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
-                        없음
+                        {activePet?.species === 'dog' ? (
+                            <DogIcon className="w-16 h-16" />
+                        ) : (
+                            <CatIcon className="w-16 h-16" />
+                        )}
                     </div>
                 )}
             </motion.div>
