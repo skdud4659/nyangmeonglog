@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { z } from 'zod';
 
 export const usePetCount = () => {
-    // 데이터 임시 입력
     const [petCount, setPetCount] = useState<PetCountData>({
         dogs: 0,
-        cats: 1,
+        cats: 0,
     });
 
     const validate = () => {

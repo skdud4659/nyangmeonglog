@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { z } from 'zod';
 
 export const useOwnerInfo = () => {
-    // 데이터 임시 입력
     const [ownerInfo, setOwnerInfo] = useState<OwnerInfoData>({
-        name: '김냥이',
+        name: '',
         photo: '',
     });
 

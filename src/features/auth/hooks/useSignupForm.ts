@@ -37,7 +37,7 @@ export const useSignupForm = () => {
     };
 
     const isFormValid =
-        form.email &&
+        !!form.email &&
         /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(form.password) &&
         form.confirmPassword === form.password;
 

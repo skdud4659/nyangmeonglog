@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ownerInfoSchema = z.object({
-    name: z.string().min(1, '이름을 입력해주세요'),
+    name: z.string().trim().min(1, '이름을 입력해주세요'),
     photo: z.string().optional(),
 });
 
