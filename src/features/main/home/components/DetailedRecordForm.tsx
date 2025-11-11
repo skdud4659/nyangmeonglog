@@ -1,6 +1,6 @@
 import { getPetById, updatePet } from '@/features/main/home/api/petsApi';
 import { upsertSimpleRecord } from '@/features/main/home/api/recordsApi';
-import { eventIconMap } from '@/features/main/home/lib/icons';
+import { eventIconMap } from '@/features/main/home/composables/iconsMap';
 import type { SimpleRecord } from '@/features/main/home/types/record';
 import AddPhotoIcon from '@/shared/assets/icons/addPhotoIcon.svg?react';
 import ClearIcon from '@/shared/assets/icons/clearIcon.svg?react';

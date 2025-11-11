@@ -2,7 +2,7 @@ import { getUserPets, type PetItem } from '@/features/main/home/api/petsApi';
 import {
     getActivePetId as dbGetActive,
     setActivePetId as dbSetActive,
-} from '@/shared/lib/profileApi';
+} from '@/shared/api/profileApi';
 import { useAuthStore } from '@/shared/store/authStore';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';

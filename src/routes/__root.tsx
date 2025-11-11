@@ -1,6 +1,6 @@
 import MainContainer from '@/features/main/MainContainer';
 import { ROUTE_PATH } from '@/routes/constant';
-import { getActivePetId as dbGetActive } from '@/shared/lib/profileApi';
+import { getActivePetId as dbGetActive } from '@/shared/api/profileApi';
 import { supabase } from '@/shared/lib/supabase';
 import { usePetStore } from '@/shared/store/petStore';
 import { createRootRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router';

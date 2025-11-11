@@ -1,4 +1,4 @@
-import { eventIconMap } from '@/features/main/home/lib/icons';
+import { eventIconMap } from '@/features/main/home/composables/iconsMap';
 import type { EventItem } from '@/features/main/home/types/event';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
