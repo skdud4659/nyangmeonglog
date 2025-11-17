@@ -43,3 +43,6 @@ Thumbs.db
 # Windows thumbnail cache
 ehthumbs.db
 Desktop.ini
+
+# Claude
+.claude/
